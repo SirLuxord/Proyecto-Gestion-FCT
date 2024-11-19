@@ -1,22 +1,34 @@
 package dad.gestion_fct.controllers.alumno;
 
-import javafx.application.Application;
+import dad.gestion_fct.models.Alumno;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class AlumnoController extends Application {
+public class AlumnoController implements Initializable {
 
+    // Model
+
+    private ObjectProperty<Alumno> selectedAlumno = new SimpleObjectProperty<>();
+
+    // View
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void initialize(URL location, ResourceBundle resources) {
 
+        // Bindings
+        selectedAlumno.bind(alumnoTable.getSelectionModel().selectedItemProperty());
     }
 
     public AlumnoController() {
@@ -33,25 +45,28 @@ public class AlumnoController extends Application {
     private BorderPane root;
 
     @FXML
-    private TableView<?> alumnoTable;
+    private TableView<Alumno> alumnoTable;
 
     @FXML
-    private TableColumn<?, ?> apellidoAlumColumn;
+    private TableColumn<Alumno, String> apellidoAlumColumn;
 
     @FXML
-    private TableColumn<?, ?> cialAlumnoColumn;
+    private TableColumn<Alumno, String> cialAlumnoColumn;
 
     @FXML
-    private TableColumn<?, ?> cicloAlumColumn;
+    private TableColumn<Alumno, String> cicloAlumColumn;
 
     @FXML
-    private TableColumn<?, ?> docenteAlumColumn;
+    private TableColumn<Alumno, String> docenteAlumColumn;
 
     @FXML
-    private TableColumn<?, ?> nombreAlumColumn;
+    private TableColumn<Alumno, String> nombreAlumColumn;
 
     @FXML
-    private TableColumn<?, ?> nussAlumColumn;
+    private TableColumn<Alumno, String> nussAlumColumn;
+
+    @FXML
+    private SplitPane splitAlumno;
 
     @FXML
     void onCreateStudentAction(ActionEvent event) {
@@ -59,7 +74,15 @@ public class AlumnoController extends Application {
     }
 
     @FXML
-    void onDeleteStudentAction(ActionEvent event) {
+    void onSearchStudentAction(ActionEvent event) {
+        SearchAlumnoDialog searchDialog = new SearchAlumnoDialog();
+        if (searchDialog.showAndWait().isPresent()) {
+            // Consulta
+        }
+    }
+
+    @FXML
+    void onSearchAllStudentAction(ActionEvent event) {
 
     }
 
@@ -68,9 +91,15 @@ public class AlumnoController extends Application {
 
     }
 
+    @FXML
+    void onDeleteStudentAction(ActionEvent event) {
+
+    }
+
     public BorderPane getRoot() {
         return root;
     }
+
 
 
 }

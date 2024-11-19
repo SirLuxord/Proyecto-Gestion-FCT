@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class SearchAlumnoController extends Dialog<String> implements Initializable {
+public class SearchAlumnoDialog extends Dialog<String> implements Initializable {
 
 
 
@@ -45,7 +45,7 @@ public class SearchAlumnoController extends Dialog<String> implements Initializa
 
     }
 
-    public SearchAlumnoController() {
+    public SearchAlumnoDialog() {
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/alumno/searchAlumnoView.fxml"));
             loader.setController(this);
