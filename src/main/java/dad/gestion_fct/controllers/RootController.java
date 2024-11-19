@@ -1,5 +1,6 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.alumno.AlumnoController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class RootController implements Initializable {
+
+    // Model
+
+    //private AlumnoController alumnoController = new AlumnoController();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
