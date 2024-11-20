@@ -5,6 +5,7 @@ import javafx.beans.property.StringProperty;
 
 public class Alumno {
 
+    private final StringProperty idAlumno = new SimpleStringProperty();
     private final StringProperty cialAlumno = new SimpleStringProperty();
     private final StringProperty nombreAlumno = new SimpleStringProperty();
     private final StringProperty apellidoAlumno = new SimpleStringProperty();

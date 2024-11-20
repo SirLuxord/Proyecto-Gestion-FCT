@@ -1,7 +1,9 @@
 package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.models.Alumno;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,8 +21,9 @@ import java.util.ResourceBundle;
 public class AlumnoController implements Initializable {
 
     // Model
-
+    private ListProperty<Alumno> listaAlumno = new SimpleListProperty<>();
     private ObjectProperty<Alumno> selectedAlumno = new SimpleObjectProperty<>();
+    private ModifiedAlumnoController modifiedAlumnoController = new ModifiedAlumnoController(this);
 
     // View
 
@@ -89,11 +92,17 @@ public class AlumnoController implements Initializable {
     @FXML
     void onModifiedStudentAction(ActionEvent event) {
 
+        splitAlumno.getItems().add(modifiedAlumnoController.getRoot());
+        SplitPane.setResizableWithParent(modifiedAlumnoController.getRoot() , false);
     }
 
     @FXML
     void onDeleteStudentAction(ActionEvent event) {
 
+    }
+
+    public SplitPane getSplitAlumno() {
+        return splitAlumno;
     }
 
     public BorderPane getRoot() {
