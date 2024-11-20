@@ -39,8 +39,8 @@
                   <Button mnemonicParsing="false" onAction="#onAddEmpresaAction" text="Crear" />
                   <Button mnemonicParsing="false" onAction="#onSearchEmpresaAction" text="Buscar" />
                   <Button mnemonicParsing="false" onAction="#onSearchAllEmpresaAction" text="Ver todos" />
-                  <Button mnemonicParsing="false" onAction="#onModifyEmpresaAction" text="Modificar " />
-                  <Button mnemonicParsing="false" onAction="#onDeleteEmpresaAction" text="Eliminar" />
+                  <Button fx:id="modifyButton" mnemonicParsing="false" onAction="#onModifyEmpresaAction" text="Modificar " />
+                  <Button fx:id="removeButton" mnemonicParsing="false" onAction="#onDeleteEmpresaAction" text="Eliminar" />
               </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

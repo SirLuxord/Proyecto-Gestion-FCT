@@ -1,12 +1,9 @@
 package dad.gestion_fct.models;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class Empresa {
-    private final StringProperty idEmpresa = new SimpleStringProperty();
+    private final IntegerProperty idEmpresa = new SimpleIntegerProperty();
     private final StringProperty nifEmpresa = new SimpleStringProperty();
     private final StringProperty nombre = new SimpleStringProperty();
     private final StringProperty dirrecion = new SimpleStringProperty();
@@ -14,17 +11,7 @@ public class Empresa {
     private final StringProperty codigoPostal = new SimpleStringProperty();
     private final BooleanProperty publica = new SimpleBooleanProperty();
 
-    public String getIdEmpresa() {
-        return idEmpresa.get();
-    }
 
-    public StringProperty idEmpresaProperty() {
-        return idEmpresa;
-    }
-
-    public void setIdEmpresa(String idEmpresa) {
-        this.idEmpresa.set(idEmpresa);
-    }
 
     public String getNifEmpresa() {
         return nifEmpresa.get();
@@ -96,5 +83,17 @@ public class Empresa {
 
     public void setPublica(boolean publica) {
         this.publica.set(publica);
+    }
+
+    public int getIdEmpresa() {
+        return idEmpresa.get();
+    }
+
+    public IntegerProperty idEmpresaProperty() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(int idEmpresa) {
+        this.idEmpresa.set(idEmpresa);
     }
 }

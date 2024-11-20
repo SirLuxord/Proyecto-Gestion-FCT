@@ -1,15 +1,16 @@
 package dad.gestion_fct.controllers.empresa;
 
+import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.controllers.RootController;
 import dad.gestion_fct.models.Empresa;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -17,13 +18,24 @@ import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EmpresaController implements Initializable {
 
+    // controllers
+
+    EmpresaModifyController empresaModifyController = new EmpresaModifyController(this);
+
     // model
 
     private ListProperty<Empresa> empresas = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ObjectProperty<Empresa> empresaSeleccionada = new SimpleObjectProperty<>();
+    private BooleanProperty selected = new SimpleBooleanProperty(false);
 
     // view
 
@@ -54,6 +66,12 @@ public class EmpresaController implements Initializable {
     @FXML
     private TableColumn<Empresa, Boolean> publicaColumn;
 
+    @FXML
+    private Button modifyButton;
+
+    @FXML
+    private Button removeButton;
+
 
     public EmpresaController(){
         try{
@@ -68,9 +86,22 @@ public class EmpresaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        SplitPane.setResizableWithParent(empresaModifyController.getRoot() , false);
+
         // binding
 
         empresasTable.itemsProperty().bind(empresas);
+        empresaSeleccionada.bind(empresasTable.getSelectionModel().selectedItemProperty());
+        modifyButton.disableProperty().bind(selected);
+        removeButton.disableProperty().bind(selected);
+
+        empresaSeleccionada.addListener((o , ov ,nv) -> {
+            if (nv != null){
+                selected.set(true);
+            } else {
+                selected.set(false);
+            }
+        });
 
         // cell values factories
 
@@ -85,7 +116,13 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void onAddEmpresaAction(ActionEvent event) {
-
+        EmpresaCreateDialog createDialog = new EmpresaCreateDialog();
+        Optional<Empresa> result = createDialog.showAndWait();
+       if (result.isPresent()){
+           Empresa empresa = result.get();
+           empresa.setIdEmpresa(buscarId(empresa.getNifEmpresa()));
+           empresas.add(empresa);
+       }
     }
 
     @FXML
@@ -95,12 +132,34 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void onModifyEmpresaAction(ActionEvent event) {
+        empresaModifyController.setEmpresa(empresaSeleccionada.get());
+        splitEmpresa.getItems().add(empresaModifyController.getRoot());
 
     }
 
     @FXML
     void onSearchAllEmpresaAction(ActionEvent event) {
+        String query = "Select * from Empresa";
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
 
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                Empresa empresa = new Empresa();
+                empresa.setIdEmpresa(resultSet.getInt("IdEmpresa"));
+                empresa.setNifEmpresa(resultSet.getString("NIFEmpresa"));
+                empresa.setNombre(resultSet.getString("NombreEmpresa"));
+                empresa.setDirrecion(resultSet.getString("DireccionEmpresa"));
+                empresa.setLocalidad(resultSet.getString("LocalidadEmpresa"));
+                empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
+                empresa.setPublica(resultSet.getBoolean("PublicaPrivada"));
+                empresas.add(empresa);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -108,9 +167,18 @@ public class EmpresaController implements Initializable {
 
     }
 
+    public int buscarId(String nif){
+        // TODO
+        return 0;
+    }
+
     // Getters and Setters
 
     public BorderPane getRoot() {
         return root;
+    }
+
+    public SplitPane getSplitEmpresa() {
+        return splitEmpresa;
     }
 }
