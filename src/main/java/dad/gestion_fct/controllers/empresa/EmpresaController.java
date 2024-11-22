@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -127,14 +124,18 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void onDeleteEmpresaAction(ActionEvent event) {
-
+        empresas.remove(empresaSeleccionada.get());
+        Alert borradoAlert = new Alert(Alert.AlertType.WARNING);
+        borradoAlert.setTitle("Alerta: Borrado");
+        borradoAlert.setHeaderText("Si borras este registro se borran sus contactos, plazas y tutores asociados.");
+        borradoAlert.setContentText("¿Estas seguro que quieres borrarlo?");
+        // TODO
     }
 
     @FXML
     void onModifyEmpresaAction(ActionEvent event) {
         empresaModifyController.setEmpresa(empresaSeleccionada.get());
         splitEmpresa.getItems().add(empresaModifyController.getRoot());
-
     }
 
     @FXML
@@ -168,8 +169,17 @@ public class EmpresaController implements Initializable {
     }
 
     public int buscarId(String nif){
-        // TODO
-        return 0;
+        String query = "Select IdEmpresa from Empresa where NIFEmpresa = ?";
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)){
+
+            statement.setString(1 , nif);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.getInt("IdEmpresa");
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Getters and Setters
