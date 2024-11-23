@@ -46,7 +46,7 @@ public class EmpresaCreateDialog extends Dialog<Empresa> implements Initializabl
 
     public EmpresaCreateDialog(){
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/empresa/modifyEmpresaView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/empresa/createEmpresaView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {

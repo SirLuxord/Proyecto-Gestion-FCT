@@ -1,24 +1,21 @@
 package dad.gestion_fct.controllers.empresa;
 
 import dad.gestion_fct.HikariConnection;
-import dad.gestion_fct.controllers.RootController;
 import dad.gestion_fct.models.Empresa;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -32,7 +29,6 @@ public class EmpresaController implements Initializable {
 
     private ListProperty<Empresa> empresas = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ObjectProperty<Empresa> empresaSeleccionada = new SimpleObjectProperty<>();
-    private BooleanProperty selected = new SimpleBooleanProperty(false);
 
     // view
 
@@ -69,6 +65,14 @@ public class EmpresaController implements Initializable {
     @FXML
     private Button removeButton;
 
+    @FXML
+    private Button createButton;
+
+    @FXML
+    private Button searchButton;
+
+    @FXML
+    private Button searchAllButton;
 
     public EmpresaController(){
         try{
@@ -85,20 +89,28 @@ public class EmpresaController implements Initializable {
 
         SplitPane.setResizableWithParent(empresaModifyController.getRoot() , false);
 
+        modifyButton.setDisable(true);
+        removeButton.setDisable(true);
+
         // binding
 
         empresasTable.itemsProperty().bind(empresas);
         empresaSeleccionada.bind(empresasTable.getSelectionModel().selectedItemProperty());
-        modifyButton.disableProperty().bind(selected);
-        removeButton.disableProperty().bind(selected);
+        empresasTable.disableProperty().bind(Bindings.createBooleanBinding(this::onSplitPaneChanged, splitEmpresa.getItems()));
 
         empresaSeleccionada.addListener((o , ov ,nv) -> {
-            if (nv != null){
-                selected.set(true);
-            } else {
-                selected.set(false);
-            }
+            modifyButton.setDisable(nv == null);
+            removeButton.setDisable(nv == null);
         });
+
+        empresasTable.disableProperty().addListener((o , ov , nv) -> {
+            modifyButton.setDisable(nv);
+            removeButton.setDisable(nv);
+            createButton.setDisable(nv);
+            searchButton.setDisable(nv);
+            searchAllButton.setDisable(nv);
+        });
+
 
         // cell values factories
 
@@ -109,6 +121,17 @@ public class EmpresaController implements Initializable {
         cpEmpresaColumn.setCellValueFactory(v -> v.getValue().codigoPostalProperty());
         publicaColumn.setCellValueFactory(v -> v.getValue().publicaProperty());
 
+        // cell factories
+
+        publicaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(publicaColumn));
+
+    }
+
+    private Boolean onSplitPaneChanged() {
+        if (splitEmpresa.getItems().size() == 2){
+            return true;
+        }
+        return false;
     }
 
     @FXML
@@ -117,6 +140,35 @@ public class EmpresaController implements Initializable {
         Optional<Empresa> result = createDialog.showAndWait();
        if (result.isPresent()){
            Empresa empresa = result.get();
+
+           // Antes de hacer el insert se comprueba que ni el nif ni el nombre estén vacíos.
+
+           if (empresa.getNifEmpresa().trim().isEmpty()) {
+               mostrarError("El nif de la empresa no puede estar vacío.");
+               throw new IllegalArgumentException("El nif de la empresa no puede estar vacío.");
+           }
+           if (empresa.getNombre().trim().isEmpty()) {
+               mostrarError("El nombre de la empresa no puede estar vacío.");
+               throw new IllegalArgumentException("El nombre de la empresa no puede estar vacío.");
+           }
+
+           String query = "Insert into Empresa (NIFEmpresa, NombreEmpresa, DireccionEmpresa, LocalidadEmpresa, CPEmpresa, EmpresaPublica) VALUES ( ?, ?, ?, ?, ?, ?)";
+           try (Connection connection = HikariConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)){
+
+               statement.setString(1 , empresa.getNifEmpresa());
+               statement.setString(2 , empresa.getNombre());
+               statement.setString(3 , empresa.getDirrecion());
+               statement.setString(4 , empresa.getLocalidad());
+               statement.setString(5 , empresa.getCodigoPostal());
+               statement.setBoolean(6 , empresa.isPublica());
+
+               statement.execute();
+
+           }  catch (SQLException e) {
+               mostrarError(e.getLocalizedMessage());
+               throw new RuntimeException(e);
+           }
            empresa.setIdEmpresa(buscarId(empresa.getNifEmpresa()));
            empresas.add(empresa);
        }
@@ -124,22 +176,57 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void onDeleteEmpresaAction(ActionEvent event) {
-        empresas.remove(empresaSeleccionada.get());
+
+        int idEmpresa = empresaSeleccionada.get().getIdEmpresa();
         Alert borradoAlert = new Alert(Alert.AlertType.WARNING);
         borradoAlert.setTitle("Alerta: Borrado");
         borradoAlert.setHeaderText("Si borras este registro se borran sus contactos, plazas y tutores asociados.");
         borradoAlert.setContentText("¿Estas seguro que quieres borrarlo?");
-        // TODO
+
+        ButtonType botonAfirmativo = new ButtonType("Si" );
+        ButtonType botonNegativo = new ButtonType("No" );
+
+        borradoAlert.getButtonTypes().setAll(botonAfirmativo , botonNegativo);
+
+        Optional<ButtonType> result = borradoAlert.showAndWait();
+        if (result.get() == botonAfirmativo){
+            String[] tablas = {"ContactoEmpresa", "PlazasEmpresas", "TutorEmpresa", "Empresa"};
+
+            try (Connection connection = HikariConnection.getConnection()) {
+                for (String tabla : tablas) {
+                    String query = "Delete from " + tabla + " where IdEmpresa = ?";
+                    try (PreparedStatement statement = connection.prepareStatement(query)) {
+                        statement.setInt(1, idEmpresa);
+                        statement.execute();
+                    }
+                }
+                empresas.remove(empresaSeleccionada.get());
+            } catch (SQLException e) {
+                mostrarError(e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @FXML
     void onModifyEmpresaAction(ActionEvent event) {
-        empresaModifyController.setEmpresa(empresaSeleccionada.get());
+
+        // se le pasa al controlador de modificar los datos del registro seleccionado
+
+        empresaModifyController.setEmpresa(new Empresa());
+        empresaModifyController.getEmpresa().setIdEmpresa(empresaSeleccionada.get().getIdEmpresa());
+        empresaModifyController.getEmpresa().setNifEmpresa(empresaSeleccionada.get().getNifEmpresa());
+        empresaModifyController.getEmpresa().setNombre(empresaSeleccionada.get().getNombre());
+        empresaModifyController.getEmpresa().setDirrecion(empresaSeleccionada.get().getDirrecion());
+        empresaModifyController.getEmpresa().setLocalidad(empresaSeleccionada.get().getLocalidad());
+        empresaModifyController.getEmpresa().setCodigoPostal(empresaSeleccionada.get().getCodigoPostal());
+        empresaModifyController.getEmpresa().setPublica(empresaSeleccionada.get().isPublica());
         splitEmpresa.getItems().add(empresaModifyController.getRoot());
     }
 
     @FXML
     void onSearchAllEmpresaAction(ActionEvent event) {
+        empresas.setAll(FXCollections.observableArrayList());
         String query = "Select * from Empresa";
         try (Connection connection = HikariConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -154,17 +241,47 @@ public class EmpresaController implements Initializable {
                 empresa.setDirrecion(resultSet.getString("DireccionEmpresa"));
                 empresa.setLocalidad(resultSet.getString("LocalidadEmpresa"));
                 empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
-                empresa.setPublica(resultSet.getBoolean("PublicaPrivada"));
+                empresa.setPublica(resultSet.getBoolean("EmpresaPublica"));
                 empresas.add(empresa);
             }
 
         } catch (SQLException e) {
+            mostrarError(e.getLocalizedMessage());
             throw new RuntimeException(e);
         }
     }
 
     @FXML
     void onSearchEmpresaAction(ActionEvent event) {
+        EmpresaSearchDialog searchDialog = new EmpresaSearchDialog();
+        Optional<String> result = searchDialog.showAndWait();
+        if (result.isPresent()) {
+            empresas.removeAll();
+            String query = "Select * from Empresa where NIFEmpresa = ?";
+            try (Connection connection = HikariConnection.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
+
+                statement.setString(1 , result.get());
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+
+                Empresa empresa = new Empresa();
+                empresa.setIdEmpresa(resultSet.getInt("IdEmpresa"));
+                empresa.setNifEmpresa(resultSet.getString("NIFEmpresa"));
+                empresa.setNombre(resultSet.getString("NombreEmpresa"));
+                empresa.setDirrecion(resultSet.getString("DireccionEmpresa"));
+                empresa.setLocalidad(resultSet.getString("LocalidadEmpresa"));
+                empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
+                empresa.setPublica(resultSet.getBoolean("EmpresaPublica"));
+
+                empresas.setAll(FXCollections.observableArrayList());
+                empresas.add(empresa);
+
+            } catch (SQLException e) {
+                mostrarError(e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+        }
 
     }
 
@@ -175,11 +292,21 @@ public class EmpresaController implements Initializable {
 
             statement.setString(1 , nif);
             ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
             return resultSet.getInt("IdEmpresa");
 
         } catch (SQLException e) {
+            mostrarError(e.getLocalizedMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public void mostrarError(String error){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setTitle("Error");
+        errorAlert.setHeaderText("Ha habido algún error");
+        errorAlert.setContentText("Error: " + error);
+        errorAlert.show();
     }
 
     // Getters and Setters
@@ -190,5 +317,17 @@ public class EmpresaController implements Initializable {
 
     public SplitPane getSplitEmpresa() {
         return splitEmpresa;
+    }
+
+    public Empresa getEmpresaSeleccionada() {
+        return empresaSeleccionada.get();
+    }
+
+    public ObjectProperty<Empresa> empresaSeleccionadaProperty() {
+        return empresaSeleccionada;
+    }
+
+    public void setEmpresaSeleccionada(Empresa empresaSeleccionada) {
+        this.empresaSeleccionada.set(empresaSeleccionada);
     }
 }
