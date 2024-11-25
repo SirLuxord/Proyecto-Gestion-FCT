@@ -1,5 +1,6 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.ContactoEmp.ContactoEmpController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,10 +12,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class RootController implements Initializable {
+    ContactoEmpController contactoEmpController = new ContactoEmpController();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        contactoTab.setContent(contactoEmpController.getRoot());
     }
 
     public RootController() {
