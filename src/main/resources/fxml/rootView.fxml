@@ -10,7 +10,7 @@
       <Tab fx:id="tutorEmpTab" text="Tutor Emp." />
       <Tab fx:id="docenteTab" text="Docente" />
       <Tab fx:id="comentariosTab" text="Comentarios" />
-      <Tab fx:id="contactoTab" text="Contacto" />
+      <Tab fx:id="contactoTab" text="Contacto"/>
       <Tab fx:id="visitasTab" text="Visitas" />
       <Tab fx:id="asignacionesTab" text="Asignaciones" />
       <Tab fx:id="plazasTab" text="Plazas" />
