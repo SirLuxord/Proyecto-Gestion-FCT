@@ -96,4 +96,9 @@ public class Empresa {
     public void setIdEmpresa(int idEmpresa) {
         this.idEmpresa.set(idEmpresa);
     }
+
+    @Override
+    public String toString() {
+        return getNombre();
+    }
 }

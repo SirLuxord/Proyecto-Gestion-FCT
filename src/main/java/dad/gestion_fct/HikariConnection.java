@@ -11,7 +11,7 @@ public class HikariConnection {
 
     static {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mariadb://localhost:3306/gestion_fct"); // Cambia "empresa" por el nombre de tu base de datos
+        config.setJdbcUrl("jdbc:mariadb://localhost:3306/gestionfct"); // Cambia "empresa" por el nombre de tu base de datos
         config.setUsername("root"); // Cambia "tu_usuario" por tu usuario de base de datos
         config.setPassword(""); // Cambia "tu_contraseña" por tu contraseña de base de datos
         config.setMaximumPoolSize(10); // Tamaño máximo del pool

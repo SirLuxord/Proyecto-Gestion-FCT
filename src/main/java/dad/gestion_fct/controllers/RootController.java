@@ -1,5 +1,7 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.empresa.EmpresaController;
+import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,9 +14,13 @@ import java.util.ResourceBundle;
 
 public class RootController implements Initializable {
 
+    EmpresaController empresaController = new EmpresaController();
+    TutorEmpresaController tutorEmpresaController = new TutorEmpresaController();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        empresasTab.setContent(empresaController.getRoot());
+        tutorEmpTab.setContent(tutorEmpresaController.getRoot());
     }
 
     public RootController() {
