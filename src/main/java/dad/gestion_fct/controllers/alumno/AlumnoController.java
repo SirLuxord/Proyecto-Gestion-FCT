@@ -69,6 +69,9 @@ public class AlumnoController implements Initializable {
     private TableColumn<Alumno, String> nussAlumColumn;
 
     @FXML
+    private TableColumn<Alumno, String> tutorAlumColumn;
+
+    @FXML
     private SplitPane splitAlumno;
 
     @FXML

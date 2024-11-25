@@ -19,6 +19,7 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
       <ComboBox fx:id="docenteComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
@@ -33,5 +34,8 @@
       <TextField fx:id="apellidoTextField" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <TextField fx:id="nussTextField" prefColumnCount="10" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <ComboBox fx:id="cicloComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Label />
+      <Label text="Tutor Empresa: " GridPane.rowIndex="6" />
+      <ComboBox fx:id="tutorComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
    </children>
 </GridPane>

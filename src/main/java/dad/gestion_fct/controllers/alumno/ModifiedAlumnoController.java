@@ -38,6 +38,8 @@ public class ModifiedAlumnoController implements Initializable {
                 cicloComboBox.valueProperty().unbindBidirectional(ov.cialAlumnoProperty());
                 nussTextField.textProperty().unbindBidirectional(ov.nussAlumnoProperty());
                 docenteComboBox.valueProperty().unbindBidirectional(ov.nombreDocenteProperty());
+                tutorComboBox.valueProperty().unbindBidirectional(ov.tutorDocenteProperty());
+
             }
 
             if (nv != null){
@@ -47,6 +49,7 @@ public class ModifiedAlumnoController implements Initializable {
                 cicloComboBox.valueProperty().bindBidirectional(nv.cialAlumnoProperty());
                 nussTextField.textProperty().bindBidirectional(nv.nussAlumnoProperty());
                 docenteComboBox.valueProperty().bindBidirectional(nv.nombreDocenteProperty());
+                tutorComboBox.valueProperty().bindBidirectional(nv.tutorDocenteProperty());
             }
         });
     }
@@ -79,6 +82,9 @@ public class ModifiedAlumnoController implements Initializable {
 
     @FXML
     private ComboBox<String> docenteComboBox;
+
+    @FXML
+    private ComboBox<String> tutorComboBox;
 
     @FXML
     private BorderPane root;

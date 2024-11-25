@@ -1,17 +1,20 @@
 package dad.gestion_fct.models;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Alumno {
 
-    private final StringProperty idAlumno = new SimpleStringProperty();
+    private final IntegerProperty idAlumno = new SimpleIntegerProperty();
     private final StringProperty cialAlumno = new SimpleStringProperty();
     private final StringProperty nombreAlumno = new SimpleStringProperty();
     private final StringProperty apellidoAlumno = new SimpleStringProperty();
     private final StringProperty cicloAlumno = new SimpleStringProperty();
     private final StringProperty nussAlumno = new SimpleStringProperty();
     private final StringProperty nombreDocente = new SimpleStringProperty();
+    private final StringProperty tutorDocente = new SimpleStringProperty();
 
     public Alumno() {
     }
@@ -87,4 +90,10 @@ public class Alumno {
     public void setNombreDocente(String nombreDocente) {
         this.nombreDocente.set(nombreDocente);
     }
+
+    public String getTutorDocente() {return tutorDocente.get(); }
+
+    public StringProperty tutorDocenteProperty() { return tutorDocente; }
+
+    public void setTutorDocente(String tutorDocente) { this.tutorDocente.set(tutorDocente); }
 }
