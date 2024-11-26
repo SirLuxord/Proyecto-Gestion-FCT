@@ -1,12 +1,24 @@
 package dad.gestion_fct.models;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ContactoEmp {
-    private StringProperty nombreContacto;
-    private StringProperty apellidoContacto;
-    private StringProperty telefonoContacto;
-    private StringProperty correoContacto;
+    private final StringProperty nombreContacto = new SimpleStringProperty();;
+    private final StringProperty apellidoContacto = new SimpleStringProperty();;
+    private final StringProperty telefonoContacto = new SimpleStringProperty();;
+    private final StringProperty correoContacto = new SimpleStringProperty();
+    private final IntegerProperty idContacto = new SimpleIntegerProperty();
+
+/*    public ContactoEmp() {
+        this.nombreContacto = new SimpleStringProperty();
+        this.apellidoContacto = new SimpleStringProperty();
+        this.telefonoContacto = new SimpleStringProperty();
+        this.correoContacto = new SimpleStringProperty();
+        //this.idContacto = new SimpleIntegerProperty();
+    }  */
 
     public String getNombreContacto() {
         return nombreContacto.get();
@@ -54,5 +66,16 @@ public class ContactoEmp {
 
     public void setCorreoContacto(String correoContacto) {
         this.correoContacto.set(correoContacto);
+    }
+
+    public int getIdContacto() {
+        return idContacto.get();
+    }
+    public void setIdContacto(int idContacto) {
+        this.idContacto.set(idContacto);
+    }
+
+    public IntegerProperty idContactoProperty() {
+        return idContacto;
     }
 }
