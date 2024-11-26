@@ -20,8 +20,8 @@ public class ModifiedAlumnoController implements Initializable {
 
     // Model
 
-    AlumnoController alumnoController;
-    ObjectProperty<Alumno> alumnoModify = new SimpleObjectProperty<>();
+    private final AlumnoController alumnoController;
+    private final ObjectProperty<Alumno> alumnoModify = new SimpleObjectProperty<>();
 
     // View
 

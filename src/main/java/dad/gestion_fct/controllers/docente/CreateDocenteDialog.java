@@ -1,7 +1,12 @@
 package dad.gestion_fct.controllers.docente;
 
+import dad.gestion_fct.controllers.alumno.ModifiedAlumnoController;
+import dad.gestion_fct.models.Alumno;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -17,6 +22,7 @@ public class CreateDocenteDialog implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+
     }
 
     public CreateDocenteDialog() {
@@ -30,13 +36,13 @@ public class CreateDocenteDialog implements Initializable {
     }
 
     @FXML
+    private TextField nombreTextField;
+
+    @FXML
     private TextField apellidoTextField;
 
     @FXML
     private TextField emailTextField;
-
-    @FXML
-    private TextField nombreTextField;
 
     @FXML
     private GridPane root;
