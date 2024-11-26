@@ -3,6 +3,7 @@ package dad.gestion_fct.controllers.docente;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
@@ -19,7 +20,7 @@ public class SearchDocenteDialog implements Initializable {
 
     public SearchDocenteDialog() {
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/docente/searchDocenteView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {
@@ -28,10 +29,10 @@ public class SearchDocenteDialog implements Initializable {
     }
 
     @FXML
-    private BorderPane root;
+    private ComboBox<String> fieldComboBox;
 
     @FXML
-    private TextField telefonoTextField;
+    private BorderPane root;
 
     public BorderPane getRoot() {
         return root;

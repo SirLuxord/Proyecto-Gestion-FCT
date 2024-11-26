@@ -5,10 +5,7 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -18,36 +15,39 @@ import java.util.ResourceBundle;
 public class SearchAlumnoDialog extends Dialog<String> implements Initializable {
 
 
-
     // Model
 
-    StringProperty cialProperty = new SimpleStringProperty();
+    StringProperty campo = new SimpleStringProperty();
 
     // View
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        fieldComboBox.getItems().addAll("Cial", "Nombre", "Apellido", "Ciclo", "Nuss", "Docente", "Tutor Empresa");
+
+        // bindings
+
+        campo.bind(fieldComboBox.getSelectionModel().selectedItemProperty());
+
         // init dialog
 
         setTitle("Buscar");
-        setHeaderText("Introduzca el cial del alumno a buscar:");
+        setHeaderText("Elija el campo del alumno a buscar:");
         getDialogPane().setContent(root);
         getDialogPane().getButtonTypes().setAll(
                 new ButtonType("Buscar", ButtonBar.ButtonData.OK_DONE),
                 ButtonType.CANCEL
         );
+
         setResultConverter(this::onResult);
 
-        // bindings
-
-        cialProperty.bind(cialTextField.textProperty());
 
     }
 
     public SearchAlumnoDialog() {
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/alumno/searchAlumnoView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {
@@ -55,17 +55,24 @@ public class SearchAlumnoDialog extends Dialog<String> implements Initializable 
         }
     }
 
+    private String onResult(ButtonType buttonType) {
+        if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
+            TextInputDialog nameDialog = new TextInputDialog();
+            nameDialog.setHeaderText("Introduzca el " + campo);
+            nameDialog.setContentText(campo + ": ");
+            //return nameDialog.showAndWait();
+        }
+
+        return "";
+    }
+
     @FXML
-    private TextField cialTextField;
+    private ComboBox<String> fieldComboBox;
 
     @FXML
     private BorderPane root;
 
-    private String onResult(ButtonType buttonType) {
-        if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
-            String cial = cialProperty.get();
-            return cial;
-        }
-        return  "";
+    public BorderPane getRoot() {
+        return root;
     }
 }

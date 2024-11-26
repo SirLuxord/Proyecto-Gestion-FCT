@@ -107,8 +107,8 @@ public class AlumnoController implements Initializable {
 
     @FXML
     void onSearchStudentAction(ActionEvent event) {
-//        SearchAlumnoDialog searchDialog = new SearchAlumnoDialog();
-//        Optional<String> cial = searchDialog.showAndWait();
+        SearchAlumnoDialog searchDialog = new SearchAlumnoDialog();
+        Optional<String> cial = searchDialog.showAndWait();
 //        cial.ifPresent(value -> buscarAlumno("1", "%" + value + "%"));
 
     }
