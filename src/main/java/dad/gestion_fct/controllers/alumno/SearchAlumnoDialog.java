@@ -66,6 +66,6 @@ public class SearchAlumnoDialog extends Dialog<String> implements Initializable 
             String cial = cialProperty.get();
             return cial;
         }
-        return  null;
+        return  "";
     }
 }

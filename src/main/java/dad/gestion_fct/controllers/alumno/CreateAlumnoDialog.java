@@ -39,7 +39,7 @@ public class CreateAlumnoDialog extends Dialog<Alumno>  implements Initializable
         alumno.get().cicloAlumnoProperty().bind(cicloComboBox.getSelectionModel().selectedItemProperty());
         alumno.get().nussAlumnoProperty().bind(nussTextField.textProperty());
         alumno.get().nombreDocenteProperty().bind(docenteComboBox.getSelectionModel().selectedItemProperty());
-        alumno.get().tutorDocenteProperty().bind(tutorComboBox.getSelectionModel().selectedItemProperty());
+        alumno.get().tutorEmpresaProperty().bind(tutorComboBox.getSelectionModel().selectedItemProperty());
 
 
     }

@@ -9,13 +9,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <SplitPane fx:id="splitAlumno" BorderPane.alignment="CENTER">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <TableView fx:id="alumnoTable">
+                  <TableView fx:id="alumnoTable" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="cialAlumnoColumn" prefWidth="75.0" text="Cial" />
                         <TableColumn fx:id="nombreAlumColumn" prefWidth="75.0" text="Nombre" />

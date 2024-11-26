@@ -14,7 +14,7 @@ public class Alumno {
     private final StringProperty cicloAlumno = new SimpleStringProperty();
     private final StringProperty nussAlumno = new SimpleStringProperty();
     private final StringProperty nombreDocente = new SimpleStringProperty();
-    private final StringProperty tutorDocente = new SimpleStringProperty();
+    private final StringProperty tutorEmpresa = new SimpleStringProperty();
 
     public Alumno() {
     }
@@ -91,9 +91,9 @@ public class Alumno {
         this.nombreDocente.set(nombreDocente);
     }
 
-    public String getTutorDocente() {return tutorDocente.get(); }
+    public String getTutorEmpresa() {return tutorEmpresa.get(); }
 
-    public StringProperty tutorDocenteProperty() { return tutorDocente; }
+    public StringProperty tutorEmpresaProperty() { return tutorEmpresa; }
 
-    public void setTutorDocente(String tutorDocente) { this.tutorDocente.set(tutorDocente); }
+    public void setTutorEmpresa(String tutorEmpresa) { this.tutorEmpresa.set(tutorEmpresa); }
 }
