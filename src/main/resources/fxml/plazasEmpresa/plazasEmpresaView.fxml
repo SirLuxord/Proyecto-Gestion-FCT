@@ -15,7 +15,7 @@
             <items>
                 <VBox prefHeight="200.0" prefWidth="100.0">
                     <children>
-                        <TableView fx:id="empresasTable" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="plazasTable" VBox.vgrow="ALWAYS">
                             <columns>
                                 <TableColumn fx:id="cicloColumn" prefWidth="75.0" text="Nombre ciclo" />
                                 <TableColumn fx:id="empresaColumn" prefWidth="75.0" text="Empresa" />
