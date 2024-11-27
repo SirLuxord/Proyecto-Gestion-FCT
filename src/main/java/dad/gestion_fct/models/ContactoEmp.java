@@ -6,19 +6,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ContactoEmp {
+    private final IntegerProperty idContacto = new SimpleIntegerProperty();
+    private final IntegerProperty idEmpresa = new SimpleIntegerProperty();
     private final StringProperty nombreContacto = new SimpleStringProperty();;
     private final StringProperty apellidoContacto = new SimpleStringProperty();;
-    private final StringProperty telefonoContacto = new SimpleStringProperty();;
+    private final StringProperty telefono = new SimpleStringProperty();;
     private final StringProperty correoContacto = new SimpleStringProperty();
-    private final IntegerProperty idContacto = new SimpleIntegerProperty();
+    private final StringProperty nombreEmpresa = new SimpleStringProperty();
 
-/*    public ContactoEmp() {
-        this.nombreContacto = new SimpleStringProperty();
-        this.apellidoContacto = new SimpleStringProperty();
-        this.telefonoContacto = new SimpleStringProperty();
-        this.correoContacto = new SimpleStringProperty();
-        //this.idContacto = new SimpleIntegerProperty();
-    }  */
 
     public String getNombreContacto() {
         return nombreContacto.get();
@@ -44,16 +39,16 @@ public class ContactoEmp {
         this.apellidoContacto.set(apellidoContacto);
     }
 
-    public String getTelefonoContacto() {
-        return telefonoContacto.get();
+    public String getTelefono() {
+        return telefono.get();
     }
 
-    public StringProperty telefonoContactoProperty() {
-        return telefonoContacto;
+    public StringProperty telefonoProperty() {
+        return telefono;
     }
 
-    public void setTelefonoContacto(String telefonoContacto) {
-        this.telefonoContacto.set(telefonoContacto);
+    public void setTelefono(String telefono) {
+        this.telefono.set(telefono);
     }
 
     public String getCorreoContacto() {
@@ -77,5 +72,31 @@ public class ContactoEmp {
 
     public IntegerProperty idContactoProperty() {
         return idContacto;
+    }
+
+    public IntegerProperty idEmpresaProperty() {
+        return idEmpresa;
+    }
+
+
+    public void setIdEmpresa(int idEmpresa) {
+        this.idEmpresa.set(idEmpresa);
+    }
+
+    public int getIdEmpresa() {
+        return idEmpresa.get();
+    }
+
+
+    public String getNombreEmpresa() {
+        return nombreEmpresa.get();
+    }
+
+    public StringProperty nombreEmpresaProperty() {
+        return nombreEmpresa;
+    }
+
+    public void setNombreEmpresa(String nombreEmpresa) {
+        this.nombreEmpresa.set(nombreEmpresa);
     }
 }

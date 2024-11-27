@@ -2,12 +2,14 @@ package dad.gestion_fct.controllers.ContactoEmp;
 
 import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.models.ContactoEmp;
+import dad.gestion_fct.models.Empresa;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -22,11 +24,11 @@ import java.util.ResourceBundle;
 public class ContactoEmpModifyController implements Initializable {
     private ContactoEmpController contactoEmpController;
 
-    private ObjectProperty<ContactoEmp> contactoModify = new SimpleObjectProperty<>();
+    private ObjectProperty<ContactoEmp> contacto = new SimpleObjectProperty<>();
 
 
     @FXML
-    private ComboBox<?> empresaCombo;
+    private ComboBox<Empresa> empresaCombo;
 
     @FXML
     private TextField mailField;
@@ -50,35 +52,77 @@ public class ContactoEmpModifyController implements Initializable {
 
     }
 
-    @FXML
-    void onModifyAction(ActionEvent event) {
+    public ComboBox<Empresa> getEmpresaCombo() {
+        return empresaCombo;
+    }
 
-        String query = "Update contactoEmpresa set NombreContacto = ? , ApellidoContacto = ? , Telefono = ? , CorreoContacto = ? where idContacto = ?";
+    public void setEmpresaCombo(ComboBox<Empresa> empresaCombo) {
+        this.empresaCombo = empresaCombo;
+    }
+
+    public BorderPane getRoot() {
+        return root;
+    }
+
+
+    public void setContacto(ContactoEmp contacto) {
+        this.contacto.set(contacto); // Actualiza el contactoModify con el contacto seleccionado
+    }
+
+    public ContactoEmp getContacto() {
+        return contacto.get();
+    }
+
+    @FXML  //METODO MODIFICAR
+    void onModifyAction(ActionEvent event) {
+        //Verificar campos obligatorios
+        if (empresaCombo.getSelectionModel().getSelectedItem() == null ) {
+            mostrarAlertaError("Selección incompleta", "Debe seleccionar una empresa de la lista.");
+            return;
+        } else if (nameField.getText().trim().isEmpty()) {
+            mostrarAlertaError("Selección incompleta", "Debe ingresar un nombre de contacto.");
+            return;
+        }
+
+        if (contacto.get().getNombreContacto().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nombre no puede estar vacío");
+        }
+        if (contacto.get().getTelefono().trim().isEmpty()) {
+            throw new IllegalArgumentException("Teléfono no puede estar vacío");
+        }
+
+        String query = "Update contactoEmpresa set IdEmpresa = ?, NombreContacto = ? , ApellidoContacto = ? , Telefono = ? , CorreoContacto = ? where idContacto = ?";
         try (Connection connection = HikariConnection.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
 
-            statement.setString(1, nameField.getText());
-            statement.setString(2, surnameField.getText());
-            statement.setString(3, phoneNumberField.getText());
-            statement.setString(4, mailField.getText());
-            statement.setInt(5, contactoModify.get().getIdContacto()); // ID de la empresa del contacto a modificar
+            statement.setInt(1, contacto.get().getIdEmpresa());
+            statement.setString(2, contacto.get().getNombreContacto());
+            statement.setString(3, contacto.get().getApellidoContacto());
+            statement.setString(4, contacto.get().getTelefono());
+            statement.setString(5, contacto.get().getCorreoContacto());
+            statement.setInt(6, contacto.get().getIdContacto());
 
             statement.execute();
-            System.out.println("ID contancto: " + contactoModify.get().idContactoProperty());
+            System.out.println(contacto.get().getIdEmpresa());
+             contactoEmpController.getSelectedContactoEmp().setIdContacto(contacto.get().getIdContacto());
+            contactoEmpController.getSelectedContactoEmp().setIdEmpresa(contacto.get().getIdEmpresa());
+            contactoEmpController.getSelectedContactoEmp().setNombreEmpresa(contacto.get().getNombreEmpresa());
+            //contactoEmpController.getSelectedContactoEmp().setNombreEmpresa(empresaCombo.getSelectionModel().getSelectedItem().getNombre());
+            contactoEmpController.getSelectedContactoEmp().setNombreContacto(contacto.get().getNombreContacto());
+            contactoEmpController.getSelectedContactoEmp().setApellidoContacto(contacto.get().getApellidoContacto());
+            contactoEmpController.getSelectedContactoEmp().setTelefono(contacto.get().getTelefono());
+            contactoEmpController.getSelectedContactoEmp().setCorreoContacto(contacto.get().getCorreoContacto());
 
-
+            contactoEmpController.getSplitContactoEmp().getItems().remove(getRoot());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        /*
-        contactoEmpController.getSelectedContactoEmp().setNombreContacto(contactoModify.get().getNombreContacto());
-        contactoEmpController.getSelectedContactoEmp().setApellidoContacto(contactoModify.get().getApellidoContacto());
-        contactoEmpController.getSelectedContactoEmp().setTelefonoContacto(contactoModify.get().getTelefonoContacto());
-        contactoEmpController.getSelectedContactoEmp().setCorreoContacto(contactoModify.get().getCorreoContacto());
-        */
-
     }
+
+
+
+
 
     //recibe instancia
     public ContactoEmpModifyController(ContactoEmpController contactoEmpController) {
@@ -94,38 +138,41 @@ public class ContactoEmpModifyController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        contactoModify.addListener((o, ov, nv) -> {
+        empresaCombo.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) ->{
+            if (nv != null) {
+                contacto.get().setIdEmpresa(nv.getIdEmpresa());
+                contacto.get().setNombreEmpresa(nv.getNombre());
+            }
+        });
+
+        contacto.addListener((o, ov, nv) -> {
             if (ov != null) {
                 nameField.textProperty().unbindBidirectional(ov.nombreContactoProperty());
                 surnameField.textProperty().unbindBidirectional(ov.apellidoContactoProperty());
-                phoneNumberField.textProperty().unbindBidirectional(ov.telefonoContactoProperty());
+                phoneNumberField.textProperty().unbindBidirectional(ov.telefonoProperty());
                 mailField.textProperty().unbindBidirectional(ov.correoContactoProperty());
             }
             if (nv != null) {
                 nameField.textProperty().bindBidirectional(nv.nombreContactoProperty());
                 surnameField.textProperty().bindBidirectional(nv.apellidoContactoProperty());
-                phoneNumberField.textProperty().bindBidirectional(nv.telefonoContactoProperty());
+                phoneNumberField.textProperty().bindBidirectional(nv.telefonoProperty());
                 mailField.textProperty().bindBidirectional(nv.correoContactoProperty());
             }
+
+
+
+
         });
 
     }
 
-
-    public BorderPane getRoot() {
-        return root;
+    private void mostrarAlertaError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error de validación");
+        alert.setHeaderText(titulo);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 
-
-
-    public void setContactoModify(ContactoEmp contacto) {
-        this.contactoModify.set(contacto); // Actualiza el contactoModify con el contacto seleccionado
-
-        // Enlazar los campos con los datos del contacto
-        nameField.textProperty().set(contacto.getNombreContacto());
-        surnameField.textProperty().set(contacto.getApellidoContacto());
-        phoneNumberField.textProperty().set(contacto.getTelefonoContacto());
-        mailField.textProperty().set(contacto.getCorreoContacto());
-    }
 
 }
