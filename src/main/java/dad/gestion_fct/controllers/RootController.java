@@ -1,6 +1,7 @@
 package dad.gestion_fct.controllers;
 
 import dad.gestion_fct.controllers.empresa.EmpresaController;
+import dad.gestion_fct.controllers.plazasEmpresa.PlazasEmpresaController;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,11 +17,13 @@ public class RootController implements Initializable {
 
     EmpresaController empresaController = new EmpresaController();
     TutorEmpresaController tutorEmpresaController = new TutorEmpresaController();
+    PlazasEmpresaController plazasEmpresaController = new PlazasEmpresaController();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         empresasTab.setContent(empresaController.getRoot());
         tutorEmpTab.setContent(tutorEmpresaController.getRoot());
+        plazasTab.setContent(plazasEmpresaController.getRoot());
     }
 
     public RootController() {
@@ -32,6 +35,9 @@ public class RootController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
+    @FXML
+    private Tab plazasTab;
 
     @FXML
     private Tab alumnoTab;
