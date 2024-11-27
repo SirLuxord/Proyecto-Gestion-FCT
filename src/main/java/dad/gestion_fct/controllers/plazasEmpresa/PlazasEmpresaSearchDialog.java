@@ -5,10 +5,7 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -19,19 +16,20 @@ public class PlazasEmpresaSearchDialog extends Dialog<String> implements Initial
 
     // model
 
-    private StringProperty nombreCiclo = new SimpleStringProperty();
+    private StringProperty opcionSeleccionada = new SimpleStringProperty();
 
     // view
 
     @FXML
-    private TextField cicloField;
+    private ComboBox<String> fieldComboBox;
 
     @FXML
     private BorderPane root;
 
+
     public PlazasEmpresaSearchDialog(){
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/plazasEmpresa/searchPlazasEmpresaView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {
@@ -42,6 +40,8 @@ public class PlazasEmpresaSearchDialog extends Dialog<String> implements Initial
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        fieldComboBox.getItems().setAll("Nombre ciclo" , "Nombre empresa");
+
         // init dialog
 
         setTitle("Buscar");
@@ -51,13 +51,13 @@ public class PlazasEmpresaSearchDialog extends Dialog<String> implements Initial
 
         // Bindings
 
-        nombreCiclo.bind(cicloField.textProperty());
+        opcionSeleccionada.bind(fieldComboBox.getSelectionModel().selectedItemProperty());
 
     }
 
     private String onResult(ButtonType buttonType) {
         if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
-            return nombreCiclo.get();
+            return opcionSeleccionada.get();
         }
         return null;
     }

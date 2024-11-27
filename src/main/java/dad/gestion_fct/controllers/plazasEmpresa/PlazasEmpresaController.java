@@ -190,8 +190,7 @@ public class PlazasEmpresaController implements Initializable {
         // se le pasa al controlador de modificar los datos del registro seleccionado
 
         plazasEmpresaModifyController.setNombreCicloAnterior(plazaSeleccionada.get().getNombreCiclo());
-        plazasEmpresaModifyController.setIdEmpresaAntiguo(plazaSeleccionada.get().getIdEmpresa());
-        plazasEmpresaModifyController.getPlaza().setNombreEmpresa(plazaSeleccionada.get().getNombreEmpresa());
+        plazasEmpresaModifyController.setIdEmpresaAntiguo(plazaSeleccionada.get().getIdEmpresa());;
         plazasEmpresaModifyController.getPlaza().setNumeroPlazas(plazaSeleccionada.get().getNumeroPlazas());
 
         splitPlazas.getItems().add(plazasEmpresaModifyController.getRoot());
@@ -199,14 +198,37 @@ public class PlazasEmpresaController implements Initializable {
 
     @FXML
     void onSearchAllAction(ActionEvent event) {
+        buscarPlazas(getSearchQuery("") , "");
+    }
+
+    @FXML
+    void onSearchAction(ActionEvent event) {
+        PlazasEmpresaSearchDialog searchDialog = new PlazasEmpresaSearchDialog();
+        Optional<String> result = searchDialog.showAndWait();
+
+        if (result.isPresent()){
+            String campo = result.get();
+            TextInputDialog campoDialog = new TextInputDialog();
+            campoDialog.setHeaderText("Introduzca el " + campo);
+            campoDialog.setContentText(campo + ":");
+            Optional<String> parametroResult = campoDialog.showAndWait();
+
+            if (parametroResult.isPresent()){
+                String parametro = parametroResult.get();
+                buscarPlazas( getSearchQuery(campo) , "%" + parametro + "%");
+            }
+        }
+
+    }
+
+    public void buscarPlazas(String query , String parametro){
         plazas.clear();
-        String query = "Select PlazasEmpresas.* , Empresa.NombreEmpresa , Empresa.IdEmpresa from PlazasEmpresas inner join Empresa on Empresa.IdEmpresa = PlazasEmpresas.IdEmpresa";
         try (Connection connection = HikariConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
+            statement.setString(1 , parametro);
             ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 PlazasEmpresa plaza = new PlazasEmpresa();
                 plaza.setNombreCiclo(resultSet.getString("PlazasEmpresas.NombreCiclo"));
                 plaza.setIdEmpresa(resultSet.getInt("Empresa.IdEmpresa"));
@@ -219,35 +241,6 @@ public class PlazasEmpresaController implements Initializable {
             mostrarError(e.getLocalizedMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    @FXML
-    void onSearchAction(ActionEvent event) {
-        TutorEmpresaSearchDialog searchDialog = new TutorEmpresaSearchDialog();
-        Optional<String> result = searchDialog.showAndWait();
-        if (result.isPresent()) {
-            plazas.clear();
-            String query = "Select Plazas.* , Empresa.NombreEmpresa from PlazasEmpresas inner join Empresa on Empresa.IdEmpresa = PlazasEmpresas.IdEmpresa where NombreCiclo = ?";
-            try (Connection connection = HikariConnection.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(query)) {
-
-                statement.setString(1 , result.get());
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
-
-                PlazasEmpresa plaza = new PlazasEmpresa();
-                plaza.setNombreCiclo(resultSet.getString("PlazasEmpresas.NombreCiclo"));
-                plaza.setIdEmpresa(resultSet.getInt("Empresa.IdEmpresa"));
-                plaza.setNombreEmpresa(resultSet.getString("Empresa.NombreEmpresa"));
-                plaza.setNumeroPlazas(resultSet.getInt("PlazasEmpresas.NumeroPlazas"));
-                plazas.add(plaza);
-
-            } catch (SQLException e) {
-                mostrarError(e.getLocalizedMessage());
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
 
@@ -275,6 +268,18 @@ public class PlazasEmpresaController implements Initializable {
             mostrarError(e.getLocalizedMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getSearchQuery(String opcion) {
+        String condicion = switch (opcion) {
+            case "Nombre ciclo" -> "WHERE NombreCiclo LIKE ?";
+            case "Nombre empresa" -> "WHERE NombreEmpresa LIKE ?";
+            default -> "";
+        };
+
+
+        String query = "Select PlazasEmpresas.* , Empresa.NombreEmpresa , Empresa.IdEmpresa from PlazasEmpresas inner join Empresa on Empresa.IdEmpresa = PlazasEmpresas.IdEmpresa " + condicion ;
+        return query;
     }
 
     public void mostrarError(String error){
