@@ -10,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class SearchAlumnoDialog extends Dialog<String> implements Initializable {
@@ -17,7 +18,7 @@ public class SearchAlumnoDialog extends Dialog<String> implements Initializable 
 
     // Model
 
-    StringProperty campo = new SimpleStringProperty();
+    private final StringProperty campo = new SimpleStringProperty();
 
     // View
 
@@ -57,12 +58,8 @@ public class SearchAlumnoDialog extends Dialog<String> implements Initializable 
 
     private String onResult(ButtonType buttonType) {
         if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
-            TextInputDialog nameDialog = new TextInputDialog();
-            nameDialog.setHeaderText("Introduzca el " + campo);
-            nameDialog.setContentText(campo + ": ");
-            //return nameDialog.showAndWait();
+            return campo.get();
         }
-
         return "";
     }
 

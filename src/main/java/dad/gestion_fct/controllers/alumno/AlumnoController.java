@@ -2,6 +2,9 @@ package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.models.Alumno;
+import dad.gestion_fct.models.Ciclos;
+import dad.gestion_fct.models.Docente;
+import dad.gestion_fct.models.TutorEmpresa;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -11,9 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -57,6 +58,7 @@ public class AlumnoController implements Initializable {
 
         buscarAlumno("","");
 
+        SplitPane.setResizableWithParent(modifiedAlumnoController.getRoot() , false);
 
     }
 
@@ -108,9 +110,12 @@ public class AlumnoController implements Initializable {
     @FXML
     void onSearchStudentAction(ActionEvent event) {
         SearchAlumnoDialog searchDialog = new SearchAlumnoDialog();
-        Optional<String> cial = searchDialog.showAndWait();
-//        cial.ifPresent(value -> buscarAlumno("1", "%" + value + "%"));
-
+        Optional<String> campo = searchDialog.showAndWait();
+        TextInputDialog nameDialog = new TextInputDialog();
+        nameDialog.setHeaderText("Introduzca el " + campo.get());
+        nameDialog.setContentText(campo.get() + ": ");
+        Optional<String> result = nameDialog.showAndWait();
+        result.ifPresent(value -> buscarAlumno(campo.get(), "%" + value + "%"));
     }
 
     @FXML
@@ -120,14 +125,42 @@ public class AlumnoController implements Initializable {
 
     @FXML
     void onModifiedStudentAction(ActionEvent event) {
-
+        modifiedAlumnoController.addRemoveCombBox();
+        modifiedAlumnoController.getAlumnoModify().setIdAlumno(selectedAlumno.get().getIdAlumno());
+        modifiedAlumnoController.getAlumnoModify().setCialAlumno(selectedAlumno.get().getCialAlumno());
+        modifiedAlumnoController.getAlumnoModify().setNombreAlumno(selectedAlumno.get().getNombreAlumno());
+        modifiedAlumnoController.getAlumnoModify().setApellidoAlumno(selectedAlumno.get().getApellidoAlumno());
+        modifiedAlumnoController.getAlumnoModify().setNussAlumno(selectedAlumno.get().getNussAlumno());
+        Optional<Ciclos> matchingCiclo = modifiedAlumnoController.getCicloComboBox()
+                .getItems()
+                .stream()
+                .filter(ciclo -> ciclo.toString().equals(selectedAlumno.get().getCicloAlumno()))
+                .findFirst();
+        matchingCiclo.ifPresent(ciclo ->
+                modifiedAlumnoController.getCicloComboBox().getSelectionModel().select(ciclo)
+        );
+        Optional<Docente> matchingDocente = modifiedAlumnoController.getDocenteComboBox()
+                .getItems()
+                .stream()
+                .filter(docente -> docente.getNombreDocente().equals(selectedAlumno.get().getNombreDocente()))
+                .findFirst();
+        matchingDocente.ifPresent(docente ->
+                modifiedAlumnoController.getDocenteComboBox().getSelectionModel().select(docente)
+        );
+        Optional<TutorEmpresa> matchingTutor = modifiedAlumnoController.getTutorComboBox()
+                .getItems()
+                .stream()
+                .filter(tutor -> tutor.getNombre().equals(selectedAlumno.get().getTutorEmpresa()))
+                .findFirst();
+        matchingTutor.ifPresent(tutor ->
+                modifiedAlumnoController.getTutorComboBox().getSelectionModel().select(tutor)
+        );
         splitAlumno.getItems().add(modifiedAlumnoController.getRoot());
-        SplitPane.setResizableWithParent(modifiedAlumnoController.getRoot() , false);
     }
 
     @FXML
     void onDeleteStudentAction(ActionEvent event) {
-
+        eliminarAlumno();
     }
 
     public SplitPane getSplitAlumno() {
@@ -136,6 +169,14 @@ public class AlumnoController implements Initializable {
 
     public BorderPane getRoot() {
         return root;
+    }
+
+    public Alumno getSelectedAlumno() {
+        return selectedAlumno.get();
+    }
+
+    public ObjectProperty<Alumno> selectedAlumnoProperty() {
+        return selectedAlumno;
     }
 
     public void buscarAlumno(String opcion, String parametro){
@@ -151,14 +192,17 @@ public class AlumnoController implements Initializable {
 
             while (resultSet.next()) {
                 Alumno alumno = new Alumno();
-
+                alumno.setIdAlumno(resultSet.getInt("IdAlumno"));
                 alumno.setCialAlumno(resultSet.getString("CIALAlumno"));
                 alumno.setNombreAlumno(resultSet.getString("NombreAlumno"));
                 alumno.setApellidoAlumno(resultSet.getString("ApellidoAlumno"));
                 alumno.setCicloAlumno(resultSet.getString("CicloAlumno"));
                 alumno.setNussAlumno(resultSet.getString("NussAlumno"));
                 alumno.setNombreDocente(resultSet.getString("tutordocente.NombreDocente"));
+                alumno.setIdDocente(resultSet.getInt("tutordocente.IdDocente"));
                 alumno.setTutorEmpresa(resultSet.getString("tutorempresa.NombreTE"));
+                alumno.setIdTutor(resultSet.getInt("tutorempresa.IdTE"));
+
 
                 listaAlumno.add(alumno);
             }
@@ -170,21 +214,63 @@ public class AlumnoController implements Initializable {
 
     private static String getString(String opcion) {
         String condicion = switch (opcion) {
-            case "1" -> "WHERE CIALAlumno LIKE ?";
-            case "2" -> "WHERE NombreAlumno LIKE ?";
-            case "3" -> "WHERE ApellidoAlumno LIKE ?";
-            case "4" -> "WHERE CicloAlumno LIKE ?";
-            case "5" -> "WHERE NussAlumno LIKE ?";
-            case "6" -> "WHERE tutordocente.NombreDocente LIKE ?";
-            case "7" -> "WHERE tutorempresa.NombreTE LIKE ?";
+            case "Cial" -> "WHERE CIALAlumno LIKE ?";
+            case "Nombre" -> "WHERE NombreAlumno LIKE ?";
+            case "Apellido" -> "WHERE ApellidoAlumno LIKE ?";
+            case "Ciclo" -> "WHERE CicloAlumno LIKE ?";
+            case "Nuss" -> "WHERE NussAlumno LIKE ?";
+            case "Docente" -> "WHERE tutordocente.NombreDocente LIKE ?";
+            case "Tutor Empresa" -> "WHERE tutorempresa.NombreTE LIKE ?";
             default -> "WHERE 1 = 1";
         };
 
 
-        String query = "SELECT CIALAlumno, NombreAlumno, ApellidoAlumno, CicloAlumno, NussAlumno, tutordocente.NombreDocente, " +
-                "tutorempresa.NombreTE FROM alumno INNER JOIN tutordocente on " +
+        String query = "SELECT IdAlumno, CIALAlumno, NombreAlumno, ApellidoAlumno, CicloAlumno, NussAlumno, tutordocente.NombreDocente, tutordocente.IdDocente," +
+                "tutorempresa.NombreTE, tutorempresa.IdTE FROM alumno INNER JOIN tutordocente on " +
                 "alumno.IdDocente = tutordocente.IdDocente INNER JOIN tutorempresa on " +
                 "alumno.IDTutorE = tutorempresa.IdTE " + condicion ;
         return query;
+    }
+
+    public void eliminarAlumno(){
+        int alumnoEliminado = selectedAlumno.get().getIdAlumno();
+
+        Alert alertEliminar = new Alert(Alert.AlertType.WARNING);
+        alertEliminar.setTitle("Eliminación de alumno");
+        alertEliminar.setHeaderText("Si eliminas el alumno tambien eliminará " +
+                "en otras tablas.");
+        alertEliminar.setContentText("Tablas afectadas :\n" +
+                "- Registro de visitas");
+
+        ButtonType botonAfirmativo = new ButtonType("Borrar");
+        ButtonType botonNegativo = new ButtonType("Cancelar");
+
+        alertEliminar.getButtonTypes().setAll(botonAfirmativo , botonNegativo);
+        Optional<ButtonType> result = alertEliminar.showAndWait();
+
+        if (result.get() == botonAfirmativo){
+            String[] tablas = {"registrovisitas", "alumno"};
+            try (Connection connection = HikariConnection.getConnection()) {
+                for (String tabla : tablas) {
+                    String query = "Delete from " + tabla + " where IdAlumno = ?";
+                    try (PreparedStatement statement = connection.prepareStatement(query)) {
+                        statement.setInt(1, alumnoEliminado);
+                        statement.execute();
+                    }
+                }
+                listaAlumno.remove(selectedAlumno.get());
+            } catch (SQLException e) {
+                mostrarError(e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void mostrarError(String error){
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setTitle("Error");
+        errorAlert.setHeaderText("Ha habido algún error");
+        errorAlert.setContentText("Error: " + error);
+        errorAlert.show();
     }
 }

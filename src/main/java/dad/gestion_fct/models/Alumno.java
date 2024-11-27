@@ -15,8 +15,22 @@ public class Alumno {
     private final StringProperty nussAlumno = new SimpleStringProperty();
     private final StringProperty nombreDocente = new SimpleStringProperty();
     private final StringProperty tutorEmpresa = new SimpleStringProperty();
+    private IntegerProperty idDocente = new SimpleIntegerProperty();
+    private IntegerProperty idTutor = new SimpleIntegerProperty();
 
     public Alumno() {
+    }
+
+    public int getIdAlumno() {
+        return idAlumno.get();
+    }
+
+    public IntegerProperty idAlumnoProperty() {
+        return idAlumno;
+    }
+
+    public void setIdAlumno(int idAlumno) {
+        this.idAlumno.set(idAlumno);
     }
 
     public String getCialAlumno() {
@@ -96,4 +110,28 @@ public class Alumno {
     public StringProperty tutorEmpresaProperty() { return tutorEmpresa; }
 
     public void setTutorEmpresa(String tutorEmpresa) { this.tutorEmpresa.set(tutorEmpresa); }
+
+    public int getIdDocente() {
+        return idDocente.get();
+    }
+
+    public IntegerProperty idDocenteProperty() {
+        return idDocente;
+    }
+
+    public void setIdDocente(int idDocente) {
+        this.idDocente.set(idDocente);
+    }
+
+    public int getIdTutor() {
+        return idTutor.get();
+    }
+
+    public IntegerProperty idTutorProperty() {
+        return idTutor;
+    }
+
+    public void setIdTutor(int idTutor) {
+        this.idTutor.set(idTutor);
+    }
 }

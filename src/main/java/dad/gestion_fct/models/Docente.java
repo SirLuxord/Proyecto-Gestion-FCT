@@ -60,4 +60,21 @@ public class Docente {
     public void setTelefonoDocente(String telefonoDocente) {
         this.telefonoDocente.set(telefonoDocente);
     }
+
+    public int getIdDocente() {
+        return idDocente.get();
+    }
+
+    public IntegerProperty idDocenteProperty() {
+        return idDocente;
+    }
+
+    public void setIdDocente(int idDocente) {
+        this.idDocente.set(idDocente);
+    }
+
+    @Override
+    public String toString() {
+        return getNombreDocente();
+    }
 }
