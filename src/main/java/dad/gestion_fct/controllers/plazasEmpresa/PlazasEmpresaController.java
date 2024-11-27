@@ -4,6 +4,7 @@ import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaCreateDialog;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaModifyController;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaSearchDialog;
+import dad.gestion_fct.models.Ciclos;
 import dad.gestion_fct.models.Empresa;
 import dad.gestion_fct.models.PlazasEmpresa;
 import dad.gestion_fct.models.TutorEmpresa;
@@ -192,6 +193,24 @@ public class PlazasEmpresaController implements Initializable {
         plazasEmpresaModifyController.setNombreCicloAnterior(plazaSeleccionada.get().getNombreCiclo());
         plazasEmpresaModifyController.setIdEmpresaAntiguo(plazaSeleccionada.get().getIdEmpresa());;
         plazasEmpresaModifyController.getPlaza().setNumeroPlazas(plazaSeleccionada.get().getNumeroPlazas());
+
+        Optional<Ciclos> matchingCiclo = plazasEmpresaModifyController.getCicloCombo()
+                .getItems()
+                .stream()
+                .filter(ciclo -> ciclo.toString().equals(plazaSeleccionada.get().getNombreCiclo()))
+                .findFirst();
+        matchingCiclo.ifPresent(ciclo ->
+                plazasEmpresaModifyController.getCicloCombo().getSelectionModel().select(ciclo)
+        );
+
+        Optional<Empresa> matchingEmpresa = plazasEmpresaModifyController.getEmpresaCombo()
+                .getItems()
+                .stream()
+                .filter(empresa -> empresa.getNombre().equals(plazaSeleccionada.get().getNombreEmpresa()))
+                .findFirst();
+        matchingEmpresa.ifPresent(empresa ->
+                plazasEmpresaModifyController.getEmpresaCombo().getSelectionModel().select(empresa)
+        );
 
         splitPlazas.getItems().add(plazasEmpresaModifyController.getRoot());
     }

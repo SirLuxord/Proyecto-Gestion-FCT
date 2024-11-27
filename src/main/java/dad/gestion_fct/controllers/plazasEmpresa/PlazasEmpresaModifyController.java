@@ -131,6 +131,10 @@ public class PlazasEmpresaModifyController implements Initializable {
         return empresaCombo;
     }
 
+    public ComboBox<Ciclos> getCicloCombo() {
+        return cicloCombo;
+    }
+
     public void setEmpresaCombo(ComboBox<Empresa> empresaCombo) {
         this.empresaCombo = empresaCombo;
     }
