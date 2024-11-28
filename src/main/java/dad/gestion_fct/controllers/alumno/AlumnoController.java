@@ -28,6 +28,7 @@ public class AlumnoController implements Initializable {
     private ListProperty<Alumno> listaAlumno = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ObjectProperty<Alumno> selectedAlumno = new SimpleObjectProperty<>();
     private ModifiedAlumnoController modifiedAlumnoController = new ModifiedAlumnoController(this);
+    private boolean modificar = false;
 
 
     // View
@@ -101,8 +102,10 @@ public class AlumnoController implements Initializable {
         // Buttons listener
 
         selectedAlumno.addListener((o , ov ,nv) -> {
-            modifyButton.setDisable(nv == null);
-            deleteButton.setDisable(nv == null);
+            if (!modificar) {
+                modifyButton.setDisable(nv == null);
+                deleteButton.setDisable(nv == null);
+            }
         });
 
         modifyButton.setDisable(true);
@@ -244,7 +247,11 @@ public class AlumnoController implements Initializable {
 
     @FXML
     void onModifiedStudentAction(ActionEvent event) {
+        modificar = true;
         createButton.setDisable(true);
+        modifyButton.setDisable(true);
+        deleteButton.setDisable(true);
+
         modifiedAlumnoController.addRemoveCombBox();
         Optional<Ciclos> matchingCiclo = modifiedAlumnoController.getCicloComboBox()
                 .getItems()
@@ -296,6 +303,18 @@ public class AlumnoController implements Initializable {
 
     public Button getCreateButton() {
         return createButton;
+    }
+
+    public Button getModifyButton() {
+        return modifyButton;
+    }
+
+    public Button getDeleteButton() {
+        return deleteButton;
+    }
+
+    public void setModificar(boolean modificar) {
+        this.modificar = modificar;
     }
 
     public void buscarAlumno(String opcion, String parametro){

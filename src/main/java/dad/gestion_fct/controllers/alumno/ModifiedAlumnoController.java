@@ -104,6 +104,9 @@ public class ModifiedAlumnoController implements Initializable {
     void onCancelAction(ActionEvent event) {
         alumnoController.getSplitAlumno().getItems().remove(this.getRoot());
         alumnoController.getCreateButton().setDisable(false);
+        alumnoController.getModifyButton().setDisable(false);
+        alumnoController.getDeleteButton().setDisable(false);
+        alumnoController.setModificar(false);
     }
 
     @FXML
