@@ -213,7 +213,6 @@ public class EmpresaController implements Initializable {
 
         // se le pasa al controlador de modificar los datos del registro seleccionado
 
-        empresaModifyController.setEmpresa(new Empresa());
         empresaModifyController.getEmpresa().setIdEmpresa(empresaSeleccionada.get().getIdEmpresa());
         empresaModifyController.getEmpresa().setNifEmpresa(empresaSeleccionada.get().getNifEmpresa());
         empresaModifyController.getEmpresa().setNombre(empresaSeleccionada.get().getNombre());
@@ -226,29 +225,7 @@ public class EmpresaController implements Initializable {
 
     @FXML
     void onSearchAllEmpresaAction(ActionEvent event) {
-        empresas.setAll(FXCollections.observableArrayList());
-        String query = "Select * from Empresa";
-        try (Connection connection = HikariConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()){
-                Empresa empresa = new Empresa();
-                empresa.setIdEmpresa(resultSet.getInt("IdEmpresa"));
-                empresa.setNifEmpresa(resultSet.getString("NIFEmpresa"));
-                empresa.setNombre(resultSet.getString("NombreEmpresa"));
-                empresa.setDirrecion(resultSet.getString("DireccionEmpresa"));
-                empresa.setLocalidad(resultSet.getString("LocalidadEmpresa"));
-                empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
-                empresa.setPublica(resultSet.getBoolean("EmpresaPublica"));
-                empresas.add(empresa);
-            }
-
-        } catch (SQLException e) {
-            mostrarError(e.getLocalizedMessage());
-            throw new RuntimeException(e);
-        }
+        buscarEmpresas(getSearchQuery("") , "");
     }
 
     @FXML
@@ -256,15 +233,29 @@ public class EmpresaController implements Initializable {
         EmpresaSearchDialog searchDialog = new EmpresaSearchDialog();
         Optional<String> result = searchDialog.showAndWait();
         if (result.isPresent()) {
-            empresas.removeAll();
-            String query = "Select * from Empresa where NIFEmpresa = ?";
-            try (Connection connection = HikariConnection.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(query)) {
+            String campo = result.get();
+            TextInputDialog campoDialog = new TextInputDialog();
+            campoDialog.setHeaderText("Introduzca el " + campo);
+            campoDialog.setContentText(campo + ":");
+            Optional<String> parametroResult = campoDialog.showAndWait();
 
-                statement.setString(1 , result.get());
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
+            if (parametroResult.isPresent()){
+                String parametro = parametroResult.get();
+                buscarEmpresas( getSearchQuery(campo) , "%" + parametro + "%");
+            }
+        }
 
+    }
+
+    public void buscarEmpresas(String query , String parametro){
+        empresas.clear();
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1 , parametro);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
                 Empresa empresa = new Empresa();
                 empresa.setIdEmpresa(resultSet.getInt("IdEmpresa"));
                 empresa.setNifEmpresa(resultSet.getString("NIFEmpresa"));
@@ -274,15 +265,26 @@ public class EmpresaController implements Initializable {
                 empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
                 empresa.setPublica(resultSet.getBoolean("EmpresaPublica"));
 
-                empresas.setAll(FXCollections.observableArrayList());
                 empresas.add(empresa);
-
-            } catch (SQLException e) {
-                mostrarError(e.getLocalizedMessage());
-                throw new RuntimeException(e);
             }
+        } catch (SQLException e) {
+            mostrarError(e.getLocalizedMessage());
+            throw new RuntimeException(e);
         }
+    }
 
+    private String getSearchQuery(String opcion) {
+        String condicion = switch (opcion) {
+            case "Nif" -> "WHERE NIFEmpresa LIKE ?";
+            case "Nombre" -> "WHERE NombreEmpresa LIKE ?";
+            case "Dirección" -> "WHERE DireccionEmpresa LIKE ?";
+            case "Localidad" -> "WHERE LocalidadEmpresa LIKE ?";
+            case "Código postal" -> "WHERE CPEmpresa LIKE ?";
+            default -> "";
+        };
+
+
+        return "Select * from Empresa " + condicion;
     }
 
     public int buscarId(String nif){

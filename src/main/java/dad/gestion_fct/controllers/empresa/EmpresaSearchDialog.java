@@ -5,10 +5,7 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -19,19 +16,19 @@ public class EmpresaSearchDialog extends Dialog<String> implements Initializable
 
     // model
 
-    private StringProperty nif = new SimpleStringProperty();
+    private StringProperty opcionSeleccionada = new SimpleStringProperty();
 
     // view
 
     @FXML
-    private TextField nifField;
+    private ComboBox<String> fieldComboBox;
 
     @FXML
     private BorderPane root;
 
     public EmpresaSearchDialog(){
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/empresa/searchEmpresaView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {
@@ -42,6 +39,8 @@ public class EmpresaSearchDialog extends Dialog<String> implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        fieldComboBox.getItems().setAll("Nif" , "Nombre" , "Dirección" , "Localidad" , "Código postal");
+
         // init dialog
 
         setTitle("Buscar");
@@ -51,13 +50,13 @@ public class EmpresaSearchDialog extends Dialog<String> implements Initializable
 
         // Bindings
 
-        nif.bind(nifField.textProperty());
+        opcionSeleccionada.bind(fieldComboBox.getSelectionModel().selectedItemProperty());
 
     }
 
     private String onResult(ButtonType buttonType) {
         if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
-            return nif.get();
+            return opcionSeleccionada.get();
         }
         return null;
     }

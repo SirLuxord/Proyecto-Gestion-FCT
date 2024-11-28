@@ -27,7 +27,7 @@ public class EmpresaModifyController implements Initializable {
 
     // model
 
-    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>();
+    private ObjectProperty<Empresa> empresa = new SimpleObjectProperty<>(new Empresa());
 
     // view
 
@@ -68,24 +68,14 @@ public class EmpresaModifyController implements Initializable {
 
         // Bindings
 
-        empresa.addListener( (o , ov , nv) -> {
-            if (ov != null){
-                nifField.textProperty().unbindBidirectional(ov.nifEmpresaProperty());
-                nameField.textProperty().unbindBidirectional(ov.nombreProperty());
-                localityField.textProperty().unbindBidirectional(ov.localidadProperty());
-                cpField.textProperty().unbindBidirectional(ov.codigoPostalProperty());
-                adressField.textProperty().unbindBidirectional(ov.dirrecionProperty());
-                publicCheckBox.selectedProperty().unbindBidirectional(ov.publicaProperty());
-            }
-            if (nv != null){
-                nifField.textProperty().bindBidirectional(nv.nifEmpresaProperty());
-                nameField.textProperty().bindBidirectional(nv.nombreProperty());
-                localityField.textProperty().bindBidirectional(nv.localidadProperty());
-                cpField.textProperty().bindBidirectional(nv.codigoPostalProperty());
-                adressField.textProperty().bindBidirectional(nv.dirrecionProperty());
-                publicCheckBox.selectedProperty().bindBidirectional(nv.publicaProperty());
-            }
-        });
+
+        nifField.textProperty().bindBidirectional(empresa.get().nifEmpresaProperty());
+        nameField.textProperty().bindBidirectional(empresa.get().nombreProperty());
+        localityField.textProperty().bindBidirectional(empresa.get().localidadProperty());
+        cpField.textProperty().bindBidirectional(empresa.get().codigoPostalProperty());
+        adressField.textProperty().bindBidirectional(empresa.get().dirrecionProperty());
+        publicCheckBox.selectedProperty().bindBidirectional(empresa.get().publicaProperty());
+
 
     }
 
