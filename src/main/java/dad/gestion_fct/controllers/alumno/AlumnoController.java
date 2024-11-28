@@ -1,10 +1,8 @@
 package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.HikariConnection;
-import dad.gestion_fct.models.Alumno;
-import dad.gestion_fct.models.Ciclos;
-import dad.gestion_fct.models.Docente;
-import dad.gestion_fct.models.TutorEmpresa;
+import dad.gestion_fct.controllers.empresa.EmpresaCreateDialog;
+import dad.gestion_fct.models.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -16,13 +14,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -32,6 +28,7 @@ public class AlumnoController implements Initializable {
     private ListProperty<Alumno> listaAlumno = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ObjectProperty<Alumno> selectedAlumno = new SimpleObjectProperty<>();
     private ModifiedAlumnoController modifiedAlumnoController = new ModifiedAlumnoController(this);
+
 
     // View
 
@@ -56,6 +53,60 @@ public class AlumnoController implements Initializable {
 
         alumnoTable.itemsProperty().bind(listaAlumno);
 
+        //Listener de selectedAlumno
+
+        selectedAlumno.addListener((observable, oldValue, newValue) -> {
+
+
+            if (newValue != null) {
+                // Actualizar los datos del controlador modificado
+                modifiedAlumnoController.getAlumnoModify().setIdAlumno(newValue.getIdAlumno());
+                modifiedAlumnoController.getAlumnoModify().setCialAlumno(newValue.getCialAlumno());
+                modifiedAlumnoController.getAlumnoModify().setNombreAlumno(newValue.getNombreAlumno());
+                modifiedAlumnoController.getAlumnoModify().setApellidoAlumno(newValue.getApellidoAlumno());
+                modifiedAlumnoController.getAlumnoModify().setNussAlumno(newValue.getNussAlumno());
+
+                // Actualizar ciclo
+                modifiedAlumnoController.getCicloComboBox()
+                        .getItems()
+                        .stream()
+                        .filter(ciclo -> ciclo.toString().equals(newValue.getCicloAlumno()))
+                        .findFirst()
+                        .ifPresent(ciclo ->
+                                modifiedAlumnoController.getCicloComboBox().getSelectionModel().select(ciclo)
+                        );
+
+                // Actualizar docente
+                modifiedAlumnoController.getDocenteComboBox()
+                        .getItems()
+                        .stream()
+                        .filter(docente -> docente.getNombreDocente().equals(newValue.getNombreDocente()))
+                        .findFirst()
+                        .ifPresent(docente ->
+                                modifiedAlumnoController.getDocenteComboBox().getSelectionModel().select(docente)
+                        );
+
+                // Actualizar tutor
+                modifiedAlumnoController.getTutorComboBox()
+                        .getItems()
+                        .stream()
+                        .filter(tutor -> tutor.getNombre().equals(newValue.getTutorEmpresa()))
+                        .findFirst()
+                        .ifPresent(tutor ->
+                                modifiedAlumnoController.getTutorComboBox().getSelectionModel().select(tutor)
+                        );
+            }
+        });
+
+        // Buttons listener
+
+        selectedAlumno.addListener((o , ov ,nv) -> {
+            modifyButton.setDisable(nv == null);
+            deleteButton.setDisable(nv == null);
+        });
+
+        modifyButton.setDisable(true);
+        deleteButton.setDisable(true);
         buscarAlumno("","");
 
         SplitPane.setResizableWithParent(modifiedAlumnoController.getRoot() , false);
@@ -103,19 +154,87 @@ public class AlumnoController implements Initializable {
     private SplitPane splitAlumno;
 
     @FXML
+    private Button createButton;
+
+    @FXML
+    private Button modifyButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
     void onCreateStudentAction(ActionEvent event) {
 
+
+        CreateAlumnoDialog createDialog = new CreateAlumnoDialog();
+        Optional<Alumno> result = createDialog.showAndWait();
+        result.ifPresent(alumno -> {
+             alumno = result.get();
+
+            // Antes de hacer el insert se comprueba que ni el nif ni el nombre estén vacíos.
+
+            if (alumno.getCialAlumno().trim().isEmpty()) {
+                mostrarError("El cial del alumno no puede estar vacío.");
+                throw new IllegalArgumentException("El cial del alumno no puede estar vacío.");
+            }
+            if (alumno.getNombreAlumno().trim().isEmpty()) {
+                mostrarError("El nombre del alumno no puede estar vacío.");
+                throw new IllegalArgumentException("El nombre del alumno no puede estar vacío.");
+            }
+            if (alumno.getApellidoAlumno().trim().isEmpty()) {
+                mostrarError("El apellido del alumno no puede estar vacío.");
+                throw new IllegalArgumentException("El apellido del alumno no puede estar vacío.");
+            }
+            if (alumno.getCicloAlumno().trim().isEmpty()) {
+                mostrarError("El ciclo del alumno no puede estar vacío.");
+                throw new IllegalArgumentException("El ciclo del alumno no puede estar vacío.");
+            }
+            if (alumno.getIdDocente() == null) {
+                mostrarError("El docente del alumno debe ser seleccionado.");
+                throw new IllegalArgumentException("El docente del alumno debe ser seleccionado.");
+            }
+
+            String query = "Insert into alumno (CIALAlumno, NombreAlumno, ApellidoAlumno, CicloAlumno, NussAlumno, IdDocente, IDTutorE) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
+            try (Connection connection = HikariConnection.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)){
+
+                statement.setString(1 , alumno.getCialAlumno());
+                statement.setString(2 , alumno.getNombreAlumno());
+                statement.setString(3 , alumno.getApellidoAlumno());
+                statement.setString(4 , alumno.getCicloAlumno());
+                statement.setString(5 , alumno.getNussAlumno());
+                if (alumno.getNussAlumno() != null) {
+                    statement.setString(5, alumno.getNussAlumno());
+                } else {
+                    statement.setNull(5, java.sql.Types.VARCHAR);
+                }
+                statement.setInt(6, alumno.getIdDocente());
+                if (alumno.getIdTutor() != null && alumno.getIdTutor() != 0) {
+                    statement.setInt(7, alumno.getIdTutor());
+                } else {
+                    statement.setNull(7, java.sql.Types.INTEGER);
+                }
+                statement.execute();
+
+            }  catch (SQLException e) {
+                mostrarError(e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+            listaAlumno.add(alumno);
+        });
     }
 
     @FXML
     void onSearchStudentAction(ActionEvent event) {
         SearchAlumnoDialog searchDialog = new SearchAlumnoDialog();
         Optional<String> campo = searchDialog.showAndWait();
-        TextInputDialog nameDialog = new TextInputDialog();
-        nameDialog.setHeaderText("Introduzca el " + campo.get());
-        nameDialog.setContentText(campo.get() + ": ");
-        Optional<String> result = nameDialog.showAndWait();
-        result.ifPresent(value -> buscarAlumno(campo.get(), "%" + value + "%"));
+        if (!campo.get().equals("")){
+            TextInputDialog nameDialog = new TextInputDialog();
+            nameDialog.setHeaderText("Introduzca el " + campo.get());
+            nameDialog.setContentText(campo.get() + ": ");
+            Optional<String> result = nameDialog.showAndWait();
+            result.ifPresent(value -> buscarAlumno(campo.get(), "%" + value + "%"));
+        }
     }
 
     @FXML
@@ -125,12 +244,8 @@ public class AlumnoController implements Initializable {
 
     @FXML
     void onModifiedStudentAction(ActionEvent event) {
+        createButton.setDisable(true);
         modifiedAlumnoController.addRemoveCombBox();
-        modifiedAlumnoController.getAlumnoModify().setIdAlumno(selectedAlumno.get().getIdAlumno());
-        modifiedAlumnoController.getAlumnoModify().setCialAlumno(selectedAlumno.get().getCialAlumno());
-        modifiedAlumnoController.getAlumnoModify().setNombreAlumno(selectedAlumno.get().getNombreAlumno());
-        modifiedAlumnoController.getAlumnoModify().setApellidoAlumno(selectedAlumno.get().getApellidoAlumno());
-        modifiedAlumnoController.getAlumnoModify().setNussAlumno(selectedAlumno.get().getNussAlumno());
         Optional<Ciclos> matchingCiclo = modifiedAlumnoController.getCicloComboBox()
                 .getItems()
                 .stream()
@@ -177,6 +292,10 @@ public class AlumnoController implements Initializable {
 
     public ObjectProperty<Alumno> selectedAlumnoProperty() {
         return selectedAlumno;
+    }
+
+    public Button getCreateButton() {
+        return createButton;
     }
 
     public void buscarAlumno(String opcion, String parametro){
@@ -273,4 +392,6 @@ public class AlumnoController implements Initializable {
         errorAlert.setContentText("Error: " + error);
         errorAlert.show();
     }
+
+
 }

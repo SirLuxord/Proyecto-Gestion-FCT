@@ -62,6 +62,7 @@ public class ModifiedAlumnoController implements Initializable {
                 alumnoModify.get().setTutorEmpresa(nv.getNombre());
             }
         });
+
     }
 
     public ModifiedAlumnoController(AlumnoController alumnoController) {
@@ -102,22 +103,52 @@ public class ModifiedAlumnoController implements Initializable {
     @FXML
     void onCancelAction(ActionEvent event) {
         alumnoController.getSplitAlumno().getItems().remove(this.getRoot());
+        alumnoController.getCreateButton().setDisable(false);
     }
 
     @FXML
     void onConfirmAction(ActionEvent event) {
+        String query;
+        int idAlumno = alumnoModify.get().getIdAlumno();
+        String newCial = alumnoModify.get().getCialAlumno();
+        String newNombre = alumnoModify.get().getNombreAlumno();
+        String newApellido = alumnoModify.get().getApellidoAlumno();
+        String newCiclo = alumnoModify.get().getCicloAlumno();
+        String newNuss = alumnoModify.get().getNussAlumno();
+        String newNombreDocente = alumnoModify.get().getNombreDocente();
+        int newIdDocente = alumnoModify.get().getIdDocente();
+        String newNombreTutor = alumnoModify.get().getTutorEmpresa();
+        int newIdTutor = alumnoModify.get().getIdTutor();
 
-        // UPDATE alumno SET CIALAlumno, NombreAlumno, ApellidoAlumno, CicloAlumno, NussAlumno, IdDocente, IDTutorE WHERE IdAlumno = ?
+        if (newIdTutor != -1){
+            query = "UPDATE alumno SET CIALAlumno = ?, NombreAlumno = ?, ApellidoAlumno = ?, CicloAlumno = ?, NussAlumno = ?, IdDocente = ?, IDTutorE = ? WHERE IdAlumno = ?";
+        } else {
+            query = "UPDATE alumno SET CIALAlumno = ?, NombreAlumno = ?, ApellidoAlumno = ?, CicloAlumno = ?, NussAlumno = ?, IdDocente = ?, IDTutorE = NULL WHERE IdAlumno = ?";
+        }
 
-        alumnoController.getSelectedAlumno().setCialAlumno(alumnoModify.get().getCialAlumno());
-        alumnoController.getSelectedAlumno().setNombreAlumno(alumnoModify.get().getNombreAlumno());
-        alumnoController.getSelectedAlumno().setApellidoAlumno(alumnoModify.get().getApellidoAlumno());
-        alumnoController.getSelectedAlumno().setCicloAlumno(alumnoModify.get().getCicloAlumno());
-        alumnoController.getSelectedAlumno().setNussAlumno(alumnoModify.get().getNussAlumno());
-        alumnoController.getSelectedAlumno().setNombreDocente(alumnoModify.get().getNombreDocente());
-        alumnoController.getSelectedAlumno().setIdDocente(alumnoModify.get().getIdDocente());
-        alumnoController.getSelectedAlumno().setTutorEmpresa(alumnoModify.get().getTutorEmpresa());
-        alumnoController.getSelectedAlumno().setIdTutor(alumnoModify.get().getIdTutor());
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, newCial);
+            preparedStatement.setString(2, newNombre);
+            preparedStatement.setString(3, newApellido);
+            preparedStatement.setString(4, newCiclo);
+            preparedStatement.setString(5, newNuss);
+            preparedStatement.setInt(6, newIdDocente);
+            if (newIdTutor != -1){
+                preparedStatement.setInt(7, newIdTutor);
+                preparedStatement.setInt(8, idAlumno);
+            } else {
+                preparedStatement.setInt(7, idAlumno);
+            }
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (alumnoController.getSelectedAlumno() != null){
+            actualizarRegistroCompleto(newCial, newNombre, newApellido, newCiclo, newNuss, newNombreDocente, newIdDocente, newNombreTutor, newIdTutor);
+        }
     }
 
     public void setAlumnoModify(Alumno alumnoModify) {
@@ -177,8 +208,28 @@ public class ModifiedAlumnoController implements Initializable {
     public void addRemoveCombBox(){
         docenteComboBox.getItems().clear();
         tutorComboBox.getItems().clear();
+        TutorEmpresa tutorVacio = new TutorEmpresa();
+        tutorVacio.setNombre("");
+        tutorVacio.setId(-1);
+        tutorComboBox.getItems().add(tutorVacio);
         añadirDocente();
         añadirTutores();
+    }
+
+    private void actualizarRegistroCompleto(String newCial, String newNombre, String newApellido, String newCiclo, String newNuss, String newNombreDocente, int newIdDocente, String newNombreTutor, int newIdTutor) {
+        alumnoController.getSelectedAlumno().setCialAlumno(newCial);
+        alumnoController.getSelectedAlumno().setNombreAlumno(newNombre);
+        alumnoController.getSelectedAlumno().setApellidoAlumno(newApellido);
+        alumnoController.getSelectedAlumno().setCicloAlumno(newCiclo);
+        alumnoController.getSelectedAlumno().setNussAlumno(newNuss);
+        alumnoController.getSelectedAlumno().setNombreDocente(newNombreDocente);
+        alumnoController.getSelectedAlumno().setIdDocente(newIdDocente);
+        alumnoController.getSelectedAlumno().setTutorEmpresa(newNombreTutor);
+        alumnoController.getSelectedAlumno().setIdTutor(newIdTutor);
+    }
+
+    public void actualizarRegistro(){
+
     }
 
     public ComboBox<Ciclos> getCicloComboBox() {

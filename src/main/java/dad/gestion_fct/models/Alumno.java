@@ -111,7 +111,7 @@ public class Alumno {
 
     public void setTutorEmpresa(String tutorEmpresa) { this.tutorEmpresa.set(tutorEmpresa); }
 
-    public int getIdDocente() {
+    public Integer getIdDocente() {
         return idDocente.get();
     }
 
@@ -123,7 +123,7 @@ public class Alumno {
         this.idDocente.set(idDocente);
     }
 
-    public int getIdTutor() {
+    public Integer getIdTutor() {
         return idTutor.get();
     }
 
