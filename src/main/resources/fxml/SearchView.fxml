@@ -8,20 +8,20 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <BorderPane fx:id="root" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <GridPane alignment="CENTER" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="5.0">
-         <columnConstraints>
-            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
-            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <ComboBox fx:id="fieldComboBox" prefWidth="150.0" GridPane.columnIndex="1" />
-            <Label text="Campo a buscar: " />
-         </children>
-      </GridPane>
-   </center>
+    <center>
+        <GridPane alignment="CENTER" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="5.0">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <ComboBox fx:id="fieldComboBox" prefWidth="150.0" GridPane.columnIndex="1" />
+                <Label text="Campo a buscar: " />
+            </children>
+        </GridPane>
+    </center>
 </BorderPane>

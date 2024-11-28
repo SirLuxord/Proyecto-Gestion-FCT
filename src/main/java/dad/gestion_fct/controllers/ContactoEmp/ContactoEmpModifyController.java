@@ -75,7 +75,8 @@ public class ContactoEmpModifyController implements Initializable {
 
     @FXML  //METODO MODIFICAR
     void onModifyAction(ActionEvent event) {
-        //Verificar campos obligatorios
+
+
         if (empresaCombo.getSelectionModel().getSelectedItem() == null ) {
             mostrarAlertaError("Selección incompleta", "Debe seleccionar una empresa de la lista.");
             return;
@@ -91,6 +92,7 @@ public class ContactoEmpModifyController implements Initializable {
             throw new IllegalArgumentException("Teléfono no puede estar vacío");
         }
 
+
         String query = "Update contactoEmpresa set IdEmpresa = ?, NombreContacto = ? , ApellidoContacto = ? , Telefono = ? , CorreoContacto = ? where idContacto = ?";
         try (Connection connection = HikariConnection.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -103,7 +105,7 @@ public class ContactoEmpModifyController implements Initializable {
             statement.setInt(6, contacto.get().getIdContacto());
 
             statement.execute();
-            System.out.println(contacto.get().getIdEmpresa());
+          //  System.out.println(contacto.get().getIdEmpresa());
              contactoEmpController.getSelectedContactoEmp().setIdContacto(contacto.get().getIdContacto());
             contactoEmpController.getSelectedContactoEmp().setIdEmpresa(contacto.get().getIdEmpresa());
             contactoEmpController.getSelectedContactoEmp().setNombreEmpresa(contacto.get().getNombreEmpresa());
