@@ -22,6 +22,8 @@ import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import static com.sun.javafx.scene.control.skin.resources.ControlResources.getString;
+
 public class ContactoEmpController implements Initializable {
 
 
@@ -181,22 +183,38 @@ public class ContactoEmpController implements Initializable {
 
                 statement.execute();
 
-            }  catch (SQLException e) {
-                 throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
             contacto.setIdContacto(buscarId(contacto.getTelefono()));
             contactos.add(contacto);
 
+            onSearchAllAction(); //para actualizar lista
         }
     }
 
     @FXML
-    void onDeleteAction(ActionEvent event) {
+    void onDeleteAction(ActionEvent event) throws SQLException {
+        int idContacto = selectedContactoEmp.get().getIdContacto();
+        String query = "Delete from contactoEmpresa where IdContacto =?";
 
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, idContacto);
+            statement.execute();
+            contactos.remove(selectedContactoEmp.get());
+            // int rowsAffected = statement.executeUpdate();
+        } catch (SQLException e) {
+            mostrarAlertaError("Error al eliminar contacto");
+            throw new RuntimeException(e);
+        }
     }
+
 
     @FXML
     void onModifyAction(ActionEvent event) {
+
         seleccionarEmpresas();
 
         contactoEmpModifyController.setContacto(new ContactoEmp());
@@ -207,6 +225,8 @@ public class ContactoEmpController implements Initializable {
         contactoEmpModifyController.getContacto().setTelefono(selectedContactoEmp.get().getTelefono());
         contactoEmpModifyController.getContacto().setCorreoContacto(selectedContactoEmp.get().getCorreoContacto());
         splitContactoEmpresa.getItems().add(contactoEmpModifyController.getRoot());
+
+        selectedContactoEmp.bind(contactoEmpresaTable.getSelectionModel().selectedItemProperty());
 
     }
 
@@ -260,6 +280,8 @@ public class ContactoEmpController implements Initializable {
                 contactos.add(contacto);  // Agregar el contacto a la lista
             }
 
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -267,18 +289,75 @@ public class ContactoEmpController implements Initializable {
     }
 
 
-
     @FXML
     void onSearchAction(ActionEvent event) {
+        ContactoEmpSearchDialog searchDialog = new ContactoEmpSearchDialog();
+        Optional<String> campo = searchDialog.showAndWait();
+        // Se ejecuta solo si el usuario selecciona un valor válido.
+        if (campo.isPresent() && !campo.get().isEmpty()) {
+            campo.get();
+            TextInputDialog nameDialog = new TextInputDialog();
+            nameDialog.setHeaderText("Introduzca el " + campo);
+            nameDialog.setContentText(campo + ": ");
+            Optional<String> result = nameDialog.showAndWait();
+            result.ifPresent(value -> {
+                try {
+                    buscarContactoEmp(campo.get(), "%" + value + "%");
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
 
     }
 
-    public int buscarId(String telefono){
+    private void buscarContactoEmp(String s, String s1) throws SQLException {
+        contactos.clear();
+
+        String query = obtenerString(s);
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, s1);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                ContactoEmp contacto = new ContactoEmp();
+              //  contacto.setIdContacto(resultSet.getInt("IdContacto"));
+             //   contacto.setIdEmpresa(resultSet.getInt("Empresa.IdEmpresa"));
+                contacto.setNombreContacto(resultSet.getString("nombreContacto"));
+                contacto.setApellidoContacto(resultSet.getString("apellidoContacto"));
+                contacto.setTelefono(resultSet.getString("telefono"));
+                contacto.setCorreoContacto(resultSet.getString("correoContacto"));
+                contacto.setNombreEmpresa(resultSet.getString("NombreEmpresa"));
+
+                contactos.add(contacto);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String obtenerString(String s) {
+        String c = switch(s) {
+            case "Nombre" -> "WHERE NombreContacto LIKE ?";
+            case "Apellido" -> "WHERE ApellidoContacto LIKE ?";
+            case "Telefono" -> "WHERE Telefono LIKE ?";
+            case "CorreoContacto" -> "WHERE CorreoContacto LIKE ?";
+            case "NombreEmpresa" -> "WHERE Empresa.NombreEmpresa LIKE ?";
+
+            default -> "WHERE 1 = 1";
+        };
+            String query = "SELECT NombreContacto, ApellidoContacto, Telefono, CorreoContacto, Empresa.NombreEmpresa FROM contactoEmpresa " +
+                    "INNER JOIN Empresa ON Empresa.IdEmpresa = contactoEmpresa.IdEmpresa " + c;
+        return query;
+    }
+
+    public int buscarId(String telefono) {
         String query = "Select IdContacto from ContactoEmpresa where Telefono = ?";
         try (Connection connection = HikariConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)){
+             PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1 , telefono);
+            statement.setString(1, telefono);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             return resultSet.getInt("IdContacto");
@@ -291,7 +370,7 @@ public class ContactoEmpController implements Initializable {
 
     private void mostrarAlertaError(String titulo) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error de validación");
+        alert.setTitle(titulo);
         alert.setHeaderText(titulo);
         alert.showAndWait();
     }
