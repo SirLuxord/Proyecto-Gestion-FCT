@@ -216,29 +216,7 @@ public class TutorEmpresaController implements Initializable {
 
     @FXML
     void onSearchAllAction(ActionEvent event) {
-        tutores.setAll(FXCollections.observableArrayList());
-        String query = "Select Empresa.IdEmpresa , Empresa.NombreEmpresa , TutorEmpresa.* from TutorEmpresa inner join Empresa on Empresa.IdEmpresa = TutorEmpresa.IdEmpresa";
-        try (Connection connection = HikariConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()){
-                TutorEmpresa tutor = new TutorEmpresa();
-                tutor.setId(resultSet.getInt("TutorEmpresa.IdTE"));
-                tutor.setIdEmpresa(resultSet.getInt("Empresa.IdEmpresa"));
-                tutor.setNombreEmpresa(resultSet.getString("Empresa.NombreEmpresa"));
-                tutor.setNombre(resultSet.getString("TutorEmpresa.NombreTE"));
-                tutor.setApellidos(resultSet.getString("TutorEmpresa.ApellidoTE"));
-                tutor.setCorreo(resultSet.getString("TutorEmpresa.CorreoTE"));
-                tutor.setTelefono(resultSet.getString("TutorEmpresa.TelefonoTE"));
-                tutores.add(tutor);
-            }
-
-        } catch (SQLException e) {
-            mostrarError(e.getLocalizedMessage());
-            throw new RuntimeException(e);
-        }
+        buscarTutores(getSearchQuery("") , "");
     }
 
     @FXML
@@ -246,14 +224,29 @@ public class TutorEmpresaController implements Initializable {
         TutorEmpresaSearchDialog searchDialog = new TutorEmpresaSearchDialog();
         Optional<String> result = searchDialog.showAndWait();
         if (result.isPresent()) {
-            tutores.setAll(FXCollections.observableArrayList());
-            String query = "Select Empresa.IdEmpresa , Empresa.NombreEmpresa , TutorEmpresa.* from TutorEmpresa inner join Empresa on Empresa.IdEmpresa = TutorEmpresa.IdEmpresa where TelefonoTE = ?";
-            try (Connection connection = HikariConnection.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(query)) {
+            String campo = result.get();
+            TextInputDialog campoDialog = new TextInputDialog();
+            campoDialog.setHeaderText("Introduzca el " + campo.toLowerCase());
+            campoDialog.setContentText(campo + ":");
+            Optional<String> parametroResult = campoDialog.showAndWait();
 
-                statement.setString(1 , result.get());
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
+            if (parametroResult.isPresent()){
+                String parametro = parametroResult.get();
+                buscarTutores( getSearchQuery(campo) , "%" + parametro + "%");
+            }
+        }
+
+    }
+
+    public void buscarTutores(String query , String parametro){
+        tutores.clear();
+        try (Connection connection = HikariConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1 , parametro);
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
 
                 TutorEmpresa tutor = new TutorEmpresa();
                 tutor.setId(resultSet.getInt("TutorEmpresa.IdTE"));
@@ -263,14 +256,27 @@ public class TutorEmpresaController implements Initializable {
                 tutor.setApellidos(resultSet.getString("TutorEmpresa.ApellidoTE"));
                 tutor.setCorreo(resultSet.getString("TutorEmpresa.CorreoTE"));
                 tutor.setTelefono(resultSet.getString("TutorEmpresa.TelefonoTE"));
+
                 tutores.add(tutor);
-
-            } catch (SQLException e) {
-                mostrarError(e.getLocalizedMessage());
-                throw new RuntimeException(e);
             }
+        } catch (SQLException e) {
+            mostrarError(e.getLocalizedMessage());
+            throw new RuntimeException(e);
         }
+    }
 
+    public String getSearchQuery(String opcion) {
+        String condicion = switch (opcion) {
+            case "Nombre empresa" -> "WHERE NombreEmpresa LIKE ?";
+            case "Nombre" -> "WHERE NombreTE LIKE ?";
+            case "Apellido" -> "WHERE ApellidoTE LIKE ?";
+            case "Correo" -> "WHERE CorreoTE LIKE ?";
+            case "Teléfono" -> "WHERE TelefonoTE LIKE ?";
+            default -> "";
+        };
+
+
+        return "Select Empresa.IdEmpresa , Empresa.NombreEmpresa , TutorEmpresa.* from TutorEmpresa inner join Empresa on Empresa.IdEmpresa = TutorEmpresa.IdEmpresa " + condicion;
     }
 
     public int buscarId(String telefono){

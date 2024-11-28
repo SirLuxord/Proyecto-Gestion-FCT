@@ -5,10 +5,7 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
@@ -19,19 +16,19 @@ public class TutorEmpresaSearchDialog extends Dialog<String> implements Initiali
 
     // model
 
-    private StringProperty telefono = new SimpleStringProperty();
+    private StringProperty opcionSeleccionada = new SimpleStringProperty();
 
     // view
 
     @FXML
-    private TextField phoneField;
+    private ComboBox<String> fieldComboBox;
 
     @FXML
     private BorderPane root;
 
     public TutorEmpresaSearchDialog(){
         try{
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/tutorEmpresa/searchTutorEmpresaView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
             loader.load();
         } catch (IOException e) {
@@ -42,6 +39,8 @@ public class TutorEmpresaSearchDialog extends Dialog<String> implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        fieldComboBox.getItems().setAll("Nombre empresa" , "Nombre" , "Apellido" , "Correo" , "Teléfono");
+
         // init dialog
 
         setTitle("Buscar");
@@ -51,13 +50,13 @@ public class TutorEmpresaSearchDialog extends Dialog<String> implements Initiali
 
         // Bindings
 
-        telefono.bind(phoneField.textProperty());
+        opcionSeleccionada.bind(fieldComboBox.getSelectionModel().selectedItemProperty());
 
     }
 
     private String onResult(ButtonType buttonType) {
         if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
-            return telefono.get();
+            return opcionSeleccionada.get();
         }
         return null;
     }
