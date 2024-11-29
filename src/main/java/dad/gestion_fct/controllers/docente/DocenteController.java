@@ -131,7 +131,7 @@ public class DocenteController implements Initializable {
         result.ifPresent(docente -> {
             docente = result.get();
 
-            // Antes de hacer el insert se comprueba que ni el nif ni el nombre estén vacíos.
+            // Antes de hacer el insert se comprueba que los cambios obligatorios no estén vacíos.
 
             if (docente.getNombreDocente().trim().isEmpty()) {
                 mostrarError("El nombre del docente no puede estar vacío.");
