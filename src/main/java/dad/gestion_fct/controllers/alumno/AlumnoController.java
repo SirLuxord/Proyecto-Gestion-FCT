@@ -1,7 +1,6 @@
 package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.HikariConnection;
-import dad.gestion_fct.controllers.empresa.EmpresaCreateDialog;
 import dad.gestion_fct.models.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,7 +55,6 @@ public class AlumnoController implements Initializable {
         //Listener de selectedAlumno
 
         selectedAlumno.addListener((observable, oldValue, newValue) -> {
-
 
             if (newValue != null) {
                 // Actualizar los datos del controlador modificado
@@ -167,7 +164,6 @@ public class AlumnoController implements Initializable {
 
     @FXML
     void onCreateStudentAction(ActionEvent event) {
-
 
         CreateAlumnoDialog createDialog = new CreateAlumnoDialog();
         Optional<Alumno> result = createDialog.showAndWait();

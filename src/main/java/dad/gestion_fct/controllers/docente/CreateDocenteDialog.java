@@ -1,7 +1,9 @@
 package dad.gestion_fct.controllers.docente;
 
+import dad.gestion_fct.controllers.alumno.AlumnoController;
 import dad.gestion_fct.controllers.alumno.ModifiedAlumnoController;
 import dad.gestion_fct.models.Alumno;
+import dad.gestion_fct.models.Docente;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -17,11 +19,32 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CreateDocenteDialog implements Initializable {
+public class CreateDocenteDialog extends Dialog<Docente> implements Initializable {
+
+    ObjectProperty<Docente> docente = new SimpleObjectProperty<>(new Docente());
+    DocenteController docenteController = new DocenteController();
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        // init dialog
+
+        setTitle("Crear");
+        setHeaderText("Introduzca los datos del alumno a buscar:");
+        getDialogPane().setContent(root);
+        getDialogPane().getButtonTypes().setAll(
+                new ButtonType("Crear", ButtonBar.ButtonData.OK_DONE),
+                ButtonType.CANCEL
+        );
+        setResultConverter(this::onResult);
+
+        // bindings
+
+        docente.get().nombreDocenteProperty().bind(nombreTextField.textProperty());
+        docente.get().apellidoDocenteProperty().bind(apellidoTextField.textProperty());
+        docente.get().emailDocenteProperty().bind(emailTextField.textProperty());
+        docente.get().telefonoDocenteProperty().bind(telTextField.textProperty());
 
     }
 
@@ -52,5 +75,13 @@ public class CreateDocenteDialog implements Initializable {
 
     public GridPane getRoot() {
         return root;
+    }
+
+
+    private Docente onResult(ButtonType buttonType) {
+        if (buttonType.getButtonData() == ButtonBar.ButtonData.OK_DONE){
+            return docente.get();
+        }
+        return null;
     }
 }
