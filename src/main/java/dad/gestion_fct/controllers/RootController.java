@@ -1,5 +1,6 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.ComentariosEmpresa.ComentariosEmpresaController;
 import dad.gestion_fct.controllers.ContactoEmp.ContactoEmpController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,10 +15,11 @@ import java.util.ResourceBundle;
 public class RootController implements Initializable {
 
     ContactoEmpController contactoEmpController = new ContactoEmpController();
-
+    ComentariosEmpresaController comentariosEmpresaController = new ComentariosEmpresaController();
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         contactoTab.setContent(contactoEmpController.getRoot());
+        comentariosTab.setContent(comentariosEmpresaController.getRoot());
     }
 
     public RootController() {

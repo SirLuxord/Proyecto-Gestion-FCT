@@ -66,6 +66,7 @@ public class ContactoEmp {
     public int getIdContacto() {
         return idContacto.get();
     }
+
     public void setIdContacto(int idContacto) {
         this.idContacto.set(idContacto);
     }

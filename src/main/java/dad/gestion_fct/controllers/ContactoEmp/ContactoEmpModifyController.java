@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import static dad.gestion_fct.controllers.ContactoEmp.ContactoEmpController.*;
+
 public class ContactoEmpModifyController implements Initializable {
     private ContactoEmpController contactoEmpController;
 
@@ -47,7 +49,6 @@ public class ContactoEmpModifyController implements Initializable {
 
     @FXML
     void onCancelAction(ActionEvent event) {
-        // Limpia la vista actual
         contactoEmpController.getSplitContactoEmp().getItems().remove(getRoot());
 
     }
@@ -88,10 +89,10 @@ public class ContactoEmpModifyController implements Initializable {
         if (contacto.get().getNombreContacto().trim().isEmpty()) {
             throw new IllegalArgumentException("Nombre no puede estar vacío");
         }
-        if (contacto.get().getTelefono().trim().isEmpty()) {
-            throw new IllegalArgumentException("Teléfono no puede estar vacío");
+        if (!ContactoEmpController.esTelefonoValido(phoneNumberField.getText())) {
+            mostrarAlertaError("Número de teléfono inválido", "Por favor ingrese un número de teléfono válido.");
+            return;
         }
-
 
         String query = "Update contactoEmpresa set IdEmpresa = ?, NombreContacto = ? , ApellidoContacto = ? , Telefono = ? , CorreoContacto = ? where idContacto = ?";
         try (Connection connection = HikariConnection.getConnection()) {
