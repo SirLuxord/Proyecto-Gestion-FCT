@@ -235,7 +235,7 @@ public class EmpresaController implements Initializable {
         if (result.isPresent()) {
             String campo = result.get();
             TextInputDialog campoDialog = new TextInputDialog();
-            campoDialog.setHeaderText("Introduzca el " + campo);
+            campoDialog.setHeaderText("Introduzca el " + campo.toLowerCase());
             campoDialog.setContentText(campo + ":");
             Optional<String> parametroResult = campoDialog.showAndWait();
 
