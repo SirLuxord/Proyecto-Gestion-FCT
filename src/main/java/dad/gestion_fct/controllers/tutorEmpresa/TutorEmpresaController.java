@@ -205,12 +205,21 @@ public class TutorEmpresaController implements Initializable {
 
         // se le pasa al controlador de modificar los datos del registro seleccionado
 
-        tutorEmpresaModifyController.setTutor(new TutorEmpresa());
         tutorEmpresaModifyController.getTutor().setId(tutorSeleccionado.get().getId());
         tutorEmpresaModifyController.getTutor().setNombre(tutorSeleccionado.get().getNombre());
         tutorEmpresaModifyController.getTutor().setApellidos(tutorSeleccionado.get().getApellidos());
         tutorEmpresaModifyController.getTutor().setCorreo(tutorSeleccionado.get().getCorreo());
         tutorEmpresaModifyController.getTutor().setTelefono(tutorSeleccionado.get().getTelefono());
+
+        Optional<Empresa> matchingEmpresa = tutorEmpresaModifyController.getEmpresaCombo()
+                .getItems()
+                .stream()
+                .filter(empresa -> empresa.getNombre().equals(tutorSeleccionado.get().getNombreEmpresa()))
+                .findFirst();
+        matchingEmpresa.ifPresent(empresa ->
+                tutorEmpresaModifyController.getEmpresaCombo().getSelectionModel().select(empresa)
+        );
+
         splitTutorEmpresa.getItems().add(tutorEmpresaModifyController.getRoot());
     }
 

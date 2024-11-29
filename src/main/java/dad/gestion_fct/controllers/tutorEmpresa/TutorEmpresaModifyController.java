@@ -28,7 +28,7 @@ public class TutorEmpresaModifyController implements Initializable {
 
     // model
 
-    private ObjectProperty<TutorEmpresa> tutor = new SimpleObjectProperty<>();
+    private ObjectProperty<TutorEmpresa> tutor = new SimpleObjectProperty<>(new TutorEmpresa());
 
     // view
 
@@ -71,20 +71,12 @@ public class TutorEmpresaModifyController implements Initializable {
             }
         });
 
-        tutor.addListener( (o , ov , nv) -> {
-            if (ov != null){
-                nameField.textProperty().unbindBidirectional(ov.nombreProperty());
-                surnameField.textProperty().unbindBidirectional(ov.apellidosProperty());
-                mailField.textProperty().unbindBidirectional(ov.correoProperty());
-                phoneNumberField.textProperty().unbindBidirectional(ov.telefonoProperty());
-            }
-            if (nv != null){
-                nameField.textProperty().bindBidirectional(nv.nombreProperty());
-                surnameField.textProperty().bindBidirectional(nv.apellidosProperty());
-                mailField.textProperty().bindBidirectional(nv.correoProperty());
-                phoneNumberField.textProperty().bindBidirectional(nv.telefonoProperty());
-            }
-        });
+
+        nameField.textProperty().bindBidirectional(tutor.get().nombreProperty());
+        surnameField.textProperty().bindBidirectional(tutor.get().apellidosProperty());
+        mailField.textProperty().bindBidirectional(tutor.get().correoProperty());
+        phoneNumberField.textProperty().bindBidirectional(tutor.get().telefonoProperty());
+
     }
 
 

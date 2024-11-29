@@ -112,8 +112,6 @@ public class PlazasEmpresaModifyController implements Initializable {
             plazasEmpresaController.getPlazaSeleccionada().setNombreCiclo(plaza.get().getNombreCiclo());
             plazasEmpresaController.getPlazaSeleccionada().setNumeroPlazas(plaza.get().getNumeroPlazas());
 
-            cicloCombo.getSelectionModel().select(null); // se resetea la selección del combo box
-
             plazasEmpresaController.getSplitPlazas().getItems().remove(getRoot());
 
         }  catch (SQLException e) {
