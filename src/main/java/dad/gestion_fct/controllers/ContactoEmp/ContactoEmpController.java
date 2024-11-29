@@ -31,7 +31,6 @@ public class ContactoEmpController implements Initializable {
 
     private ListProperty<ContactoEmp> contactos = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ObjectProperty<ContactoEmp> selectedContactoEmp = new SimpleObjectProperty<>();
-    //private ListProperty<Ciclos> ciclos = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<Empresa> empresas = new SimpleListProperty<>(FXCollections.observableArrayList());
 
 
@@ -171,11 +170,16 @@ public class ContactoEmpController implements Initializable {
                 throw new IllegalArgumentException("Campo de teléfono vacío");
             }
 
+            if (!esTelefonoValido(contacto.getTelefono())) {
+                mostrarAlertaError("numero de telefono invalido");
+                return;
+            }
+
             String query = "Insert into contactoEmpresa (IdEmpresa, NombreContacto, ApellidoContacto, Telefono, CorreoContacto) VALUES ( ?, ?, ?, ?, ?)";
             try (Connection connection = HikariConnection.getConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                statement.setInt(1, contacto.getIdEmpresa());
+                statement.setInt(1 , contacto.getIdEmpresa());
                 statement.setString(2, contacto.getNombreContacto());
                 statement.setString(3, contacto.getApellidoContacto());
                 statement.setString(4, contacto.getTelefono());
@@ -253,6 +257,7 @@ public class ContactoEmpController implements Initializable {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+
         }
     }
 
@@ -297,8 +302,8 @@ public class ContactoEmpController implements Initializable {
         if (campo.isPresent() && !campo.get().isEmpty()) {
             campo.get();
             TextInputDialog nameDialog = new TextInputDialog();
-            nameDialog.setHeaderText("Introduzca el " + campo);
-            nameDialog.setContentText(campo + ": ");
+            nameDialog.setHeaderText("Introduzca el " + campo.get());
+            nameDialog.setContentText(campo.get() + ": ");
             Optional<String> result = nameDialog.showAndWait();
             result.ifPresent(value -> {
                 try {
@@ -321,8 +326,6 @@ public class ContactoEmpController implements Initializable {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 ContactoEmp contacto = new ContactoEmp();
-              //  contacto.setIdContacto(resultSet.getInt("IdContacto"));
-             //   contacto.setIdEmpresa(resultSet.getInt("Empresa.IdEmpresa"));
                 contacto.setNombreContacto(resultSet.getString("nombreContacto"));
                 contacto.setApellidoContacto(resultSet.getString("apellidoContacto"));
                 contacto.setTelefono(resultSet.getString("telefono"));
@@ -338,15 +341,18 @@ public class ContactoEmpController implements Initializable {
     }
 
     private static String obtenerString(String s) {
+        System.out.println("Valor de s: " + s);
+
         String c = switch(s) {
             case "Nombre" -> "WHERE NombreContacto LIKE ?";
             case "Apellido" -> "WHERE ApellidoContacto LIKE ?";
-            case "Telefono" -> "WHERE Telefono LIKE ?";
-            case "CorreoContacto" -> "WHERE CorreoContacto LIKE ?";
+            case "Teléfono" -> "WHERE Telefono LIKE ?";
+            case "Correo" -> "WHERE CorreoContacto LIKE ?";
             case "NombreEmpresa" -> "WHERE Empresa.NombreEmpresa LIKE ?";
-
-            default -> "WHERE 1 = 1";
+            default -> "";
         };
+
+        System.out.println(c);
             String query = "SELECT NombreContacto, ApellidoContacto, Telefono, CorreoContacto, Empresa.NombreEmpresa FROM contactoEmpresa " +
                     "INNER JOIN Empresa ON Empresa.IdEmpresa = contactoEmpresa.IdEmpresa " + c;
         return query;
@@ -365,6 +371,19 @@ public class ContactoEmpController implements Initializable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    //Validar formato telefono
+    public static boolean esTelefonoValido(String telefono) {
+        // Validar que el número solo contenga dígitos y tenga una longitud mínima
+        String regex = "^[0-9]{9,15}$";
+
+        if (telefono == null || telefono.trim().isEmpty()) {
+            return false;
+        }
+
+        return telefono.matches(regex);
     }
 
 
