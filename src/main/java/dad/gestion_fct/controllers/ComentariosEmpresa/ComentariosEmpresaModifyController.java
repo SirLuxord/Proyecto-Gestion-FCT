@@ -42,6 +42,7 @@ public class ComentariosEmpresaModifyController implements Initializable {
 
     @FXML
     void onCancelAction(ActionEvent event) {
+
         comentariosEmpresaController.getSplitComentariosEmpresa().getItems().remove(getRoot());
     }
 
