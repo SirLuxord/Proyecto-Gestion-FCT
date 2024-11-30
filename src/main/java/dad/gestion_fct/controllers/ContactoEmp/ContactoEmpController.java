@@ -100,6 +100,7 @@ public class ContactoEmpController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         SplitPane.setResizableWithParent(contactoEmpModifyController.getRoot(), false);
         onSearchAllAction();
+
         modifyButton.setDisable(true);
         removeButton.setDisable(true);
 
@@ -122,7 +123,6 @@ public class ContactoEmpController implements Initializable {
             searchAllButton.setDisable(nv);
         });
         //empresaColumn.setCellValueFactory(v -> v.getValue().();
-        //SELECT Empresa.NombreEmpresa FROM ContactoEmpresa INNER JOIN Empresa ON ContactoEmpresa.IdEmpresa = Empresa.IdEmpresa;
         nombreColumn.setCellValueFactory(v -> v.getValue().nombreContactoProperty());
         apellidoColumn.setCellValueFactory(v -> v.getValue().apellidoContactoProperty());
         correoColumn.setCellValueFactory(v -> v.getValue().correoContactoProperty());
@@ -231,11 +231,12 @@ public class ContactoEmpController implements Initializable {
         splitContactoEmpresa.getItems().add(contactoEmpModifyController.getRoot());
 
         selectedContactoEmp.bind(contactoEmpresaTable.getSelectionModel().selectedItemProperty());
-
+        System.out.println(selectedContactoEmp.get().getIdContacto());
     }
 
 
     private void seleccionarEmpresas() {
+
         empresas.setAll(FXCollections.observableArrayList());
         String query = "Select * from Empresa";
         try (Connection connection = HikariConnection.getConnection();
@@ -253,6 +254,7 @@ public class ContactoEmpController implements Initializable {
                 empresa.setCodigoPostal(resultSet.getString("CPEmpresa"));
                 empresa.setPublica(resultSet.getBoolean("EmpresaPublica"));
                 empresas.add(empresa);
+
             }
 
         } catch (SQLException e) {

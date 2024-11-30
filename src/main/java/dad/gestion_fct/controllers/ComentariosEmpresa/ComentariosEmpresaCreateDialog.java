@@ -33,7 +33,8 @@ public class ComentariosEmpresaCreateDialog extends Dialog<ComentariosEmpresa> i
     @FXML
     private TextField nombreDocenteField;
 
-
+    @FXML
+    private TextField telefonoDocenteField;
     @FXML
     private GridPane root;
 
@@ -59,18 +60,20 @@ public class ComentariosEmpresaCreateDialog extends Dialog<ComentariosEmpresa> i
         getDialogPane().getButtonTypes().setAll(new ButtonType("Crear", ButtonBar.ButtonData.OK_DONE), ButtonType.CANCEL);
         setResultConverter(this::onResult);
 
+
         // bindings
         empresaCombo.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
             if (nv != null) {
 
-                comentario.get().setNombreDocente(nv.getNombre());
+                comentario.get().setIdEmpresa(nv.getIdEmpresa());
                 comentario.get().setNombreEmpresa(nv.getNombre());
             }
         });
 
+        comentario.get().fechaComentarioProperty().bind(fechaComentario.valueProperty());
         comentario.get().comentariosProperty().bind(comentarioField.textProperty());
         comentario.get().nombreDocenteProperty().bind(nombreDocenteField.textProperty());
-       // comentario.get().fechaComentarioProperty().bind(fechaComentario.());
+        comentario.get().telefonoDocenteProperty().bind(telefonoDocenteField.textProperty());
         //terminar
     }
     private ComentariosEmpresa onResult(ButtonType buttonType) {

@@ -21,8 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import static dad.gestion_fct.controllers.ContactoEmp.ContactoEmpController.*;
-
 public class ContactoEmpModifyController implements Initializable {
     private ContactoEmpController contactoEmpController;
 
@@ -110,7 +108,6 @@ public class ContactoEmpModifyController implements Initializable {
              contactoEmpController.getSelectedContactoEmp().setIdContacto(contacto.get().getIdContacto());
             contactoEmpController.getSelectedContactoEmp().setIdEmpresa(contacto.get().getIdEmpresa());
             contactoEmpController.getSelectedContactoEmp().setNombreEmpresa(contacto.get().getNombreEmpresa());
-            //contactoEmpController.getSelectedContactoEmp().setNombreEmpresa(empresaCombo.getSelectionModel().getSelectedItem().getNombre());
             contactoEmpController.getSelectedContactoEmp().setNombreContacto(contacto.get().getNombreContacto());
             contactoEmpController.getSelectedContactoEmp().setApellidoContacto(contacto.get().getApellidoContacto());
             contactoEmpController.getSelectedContactoEmp().setTelefono(contacto.get().getTelefono());
