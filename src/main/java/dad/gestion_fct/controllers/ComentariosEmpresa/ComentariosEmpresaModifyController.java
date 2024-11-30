@@ -68,7 +68,17 @@ public class ComentariosEmpresaModifyController implements Initializable {
     @FXML
     void onModifyAction(ActionEvent event) {
         //verificaciones
-
+        if (empresaCombo.getSelectionModel().getSelectedItem() == null) {
+            mostrarAlertaError("Selección incompleta", "Debe seleccionar una empresa de la lista.");
+            return;
+        } else if (nombreDocenteField.getText().trim().isEmpty()) {
+            mostrarAlertaError("Selección incompleta", "Debe ingresar el nombre del docente.");
+            return;
+        } else if (comentarioField.getText().trim().isEmpty()) {
+            mostrarAlertaError("Comentario vacío", "Debe ingresar un comentario.");
+            return;
+        }
+        comentariosEmpresaController.buscarIdDocente(comentario.get().getTelefonoDocente());
 
         String query = "UPDATE ComentariosCaptacionEmpresa SET FechaComentario = ?, IdEmpresa = ?, IdDocente = ?, Comentarios = ? WHERE IdComentario = ?";
         try (Connection connection = HikariConnection.getConnection();
@@ -115,7 +125,7 @@ public class ComentariosEmpresaModifyController implements Initializable {
         });
 
         comentario.addListener((o, ov, nv) -> {
-            if(ov != null) {
+            if (ov != null) {
                 nombreDocenteField.textProperty().unbindBidirectional(ov.nombreDocenteProperty());
                 telefonoDocenteField.textProperty().unbindBidirectional(ov.telefonoDocenteProperty());
                 comentarioField.textProperty().unbindBidirectional(ov.comentariosProperty());
@@ -132,6 +142,15 @@ public class ComentariosEmpresaModifyController implements Initializable {
 
             }
         });
+
     }
 
+    private void mostrarAlertaError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error de validación");
+        alert.setHeaderText(titulo);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
 }
+
