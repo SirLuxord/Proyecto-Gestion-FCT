@@ -41,11 +41,11 @@
             <children>
                 <Label text="Comentario:" />
                 <Label text="Nombre Docente" GridPane.rowIndex="1" />
-                <Label fx:id="telefonoDocenteField" text="Telefono Docente" GridPane.rowIndex="2" />
+                <Label text="Telefono Docente" GridPane.rowIndex="2" />
                 <Label text="Empresa:" GridPane.rowIndex="4" />
                 <TextField fx:id="comentarioField" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                 <TextField fx:id="nombreDocenteField" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                <TextField fx:id="mailField" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                <TextField fx:id="telefonoDocenteField" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                 <Label text="Fecha Comentario" GridPane.rowIndex="3" />
                 <ComboBox fx:id="empresaCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <DatePicker fx:id="fechaComentario" GridPane.columnIndex="1" GridPane.rowIndex="3" />

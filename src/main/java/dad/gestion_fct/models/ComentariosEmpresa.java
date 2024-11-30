@@ -1,18 +1,22 @@
 package dad.gestion_fct.models;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+
+import java.sql.Date;
+import java.time.LocalDate;
 
 public class ComentariosEmpresa {
     private final IntegerProperty idComentario = new SimpleIntegerProperty();
-    private final StringProperty fechaComentario = new SimpleStringProperty();
+    private final ObjectProperty<LocalDate> fechaComentario = new SimpleObjectProperty<>();
     private final IntegerProperty idEmpresa = new SimpleIntegerProperty();
     private final IntegerProperty IdDocente = new SimpleIntegerProperty();
     private final StringProperty comentarios = new SimpleStringProperty();
     private final StringProperty nombreEmpresa = new SimpleStringProperty();
     private final StringProperty nombreDocente = new SimpleStringProperty();
     private final StringProperty telefonoDocente = new SimpleStringProperty();
+
+    public IntegerProperty idComentarioProperty() {
+        return idComentario;
+    }
 
     public String getTelefonoDocente() {
         return telefonoDocente.get();
@@ -21,6 +25,7 @@ public class ComentariosEmpresa {
     public void setTelefonoDocente(String telefonoDocente) {
         this.telefonoDocente.set(telefonoDocente);
     }
+
     public StringProperty telefonoDocenteProperty() {
         return telefonoDocente;
     }
@@ -31,14 +36,19 @@ public class ComentariosEmpresa {
         this.idComentario.set(idComentario);
     }
 
-    public String getFechaComentario() {
+    public LocalDate getFechaComentario() {
         return fechaComentario.get();
     }
 
-    public StringProperty fechaComentarioProperty() {
-        return fechaComentario;
+    public void setFechaComentario(LocalDate fechaComentario) {
+        this.fechaComentario.set(fechaComentario);
     }
 
+
+
+    public ObjectProperty<LocalDate> fechaComentarioProperty() {
+        return fechaComentario;
+    }
     public int getIdEmpresa() {
         return idEmpresa.get();
     }
@@ -78,15 +88,13 @@ public class ComentariosEmpresa {
 
 
 
+
     public void setNombreDocente(String nombreDocente) {
         this.nombreDocente.set(nombreDocente);
     }
 
 
     // Setters
-    public void setFechaComentario(String fechaComentario) {
-        this.fechaComentario.set(fechaComentario);
-    }
 
     public void setIdEmpresa(int idEmpresa) {
         this.idEmpresa.set(idEmpresa);
@@ -100,4 +108,12 @@ public class ComentariosEmpresa {
         this.comentarios.set(comentarios);
     }
 
+
+    public String getNombreEmpresa() {
+        return nombreEmpresa.get();
+    }
+
+    public String getNombreDocente() {
+        return nombreDocente.get();
+    }
 }

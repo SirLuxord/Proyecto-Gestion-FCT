@@ -2,7 +2,6 @@ package dad.gestion_fct.controllers.ComentariosEmpresa;
 
 import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.models.ComentariosEmpresa;
-import dad.gestion_fct.models.ContactoEmp;
 import dad.gestion_fct.models.Empresa;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
@@ -20,6 +19,7 @@ import javafx.scene.layout.BorderPane;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -85,7 +85,6 @@ public class ComentariosEmpresaController implements Initializable {
     private SplitPane splitComentariosEmpresa;
 
 
-
     public ComentariosEmpresaController() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/comentariosEmpresa/comentariosEmpresaView.fxml"));
@@ -104,8 +103,21 @@ public class ComentariosEmpresaController implements Initializable {
         dialog.getEmpresaCombo().getItems().setAll(empresas);
         Optional<ComentariosEmpresa> result = dialog.showAndWait();
 
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             ComentariosEmpresa comentario = result.get();
+            comentario.setIdDocente(buscarIdDocente(comentario.getTelefonoDocente()));
+
+            // Check for empty or null values before trimming
+            if (comentario.getNombreDocente().trim().isEmpty()) {
+                mostrarAlertaError("Nombre sin introducir");
+                throw new IllegalArgumentException("Nombre sin introducir");
+            }
+
+            // Check for null or empty telefonoDocente
+            if (comentario.getTelefonoDocente() == null || comentario.getTelefonoDocente().trim().isEmpty()) {
+                mostrarAlertaError("Telefono sin introducir");
+                throw new IllegalArgumentException("Telefono sin introducir");
+            }
 
             if (comentario.getComentarios().trim().isEmpty()) {
                 mostrarAlertaError("Comentarios sin introducir");
@@ -119,6 +131,7 @@ public class ComentariosEmpresaController implements Initializable {
                 statement.setDate(1, Date.valueOf(comentario.getFechaComentario()));
                 statement.setInt(2, comentario.getIdEmpresa());
                 statement.setInt(3, comentario.getIdDocente());
+
                 statement.setString(4, comentario.getComentarios());
 
                 statement.execute();
@@ -126,13 +139,14 @@ public class ComentariosEmpresaController implements Initializable {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            comentario.setIdComentario(buscarId((comentario.getIdDocente())));
+
             comentariosEmpresa.add(comentario);
             onSearchAllAction();
         }
     }
 
     private void seleccionarEmpresas() {
+        empresas.setAll(FXCollections.observableArrayList());
         String query = "SELECT IdEmpresa, NombreEmpresa FROM Empresa";
 
         try (Connection connection = HikariConnection.getConnection();
@@ -149,24 +163,17 @@ public class ComentariosEmpresaController implements Initializable {
                 empresas.add(empresa);
             }
 
+
         } catch (SQLException e) {
             e.printStackTrace();
             mostrarAlertaError("Error al cargar las empresas");
-        }    }
-
-
-    @FXML
-    void onModifyAction(ActionEvent event) {
-       seleccionarEmpresas();
-
-       comentariosEmpresaModifyController.setComentario(new ComentariosEmpresa());
+        }
     }
-
-
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         SplitPane.setResizableWithParent(comentariosEmpresaModifyController.getRoot(), false);
         onSearchAllAction();
 
@@ -190,13 +197,37 @@ public class ComentariosEmpresaController implements Initializable {
             searchButton.setDisable(nv);
             searchAllButton.setDisable(nv);
         });
-
         comentariosColumn.setCellValueFactory(v -> v.getValue().comentariosProperty());
-        fechaComentarioColumn.setCellValueFactory(v -> v.getValue().fechaComentarioProperty());
+        fechaComentarioColumn.setCellValueFactory(v -> v.getValue().fechaComentarioProperty().asString());
         nombreEmpresaColumn.setCellValueFactory(v -> v.getValue().nombreEmpresaProperty());
         nombreDocenteColumn.setCellValueFactory(v -> v.getValue().nombreDocenteProperty());
         telefonoDocenteColumn.setCellValueFactory(v -> v.getValue().telefonoDocenteProperty());
     }
+
+
+
+    @FXML
+    void onModifyAction(ActionEvent event) {
+        seleccionarEmpresas();
+
+        comentariosEmpresaModifyController.setComentario(new ComentariosEmpresa());
+        comentariosEmpresaModifyController.getComentario().setIdComentario(selectedComentariosEmpresa.get().getIdComentario());
+        comentariosEmpresaModifyController.getComentario().setIdEmpresa(selectedComentariosEmpresa.get().getIdEmpresa());
+        comentariosEmpresaModifyController.getComentario().setIdDocente(selectedComentariosEmpresa.get().getIdDocente());
+        comentariosEmpresaModifyController.getComentario().setComentarios(selectedComentariosEmpresa.get().getComentarios());
+        comentariosEmpresaModifyController.getComentario().setNombreDocente(selectedComentariosEmpresa.get().getNombreDocente());
+        comentariosEmpresaModifyController.getComentario().setTelefonoDocente(selectedComentariosEmpresa.get().getTelefonoDocente());
+        comentariosEmpresaModifyController.getComentario().setNombreEmpresa(selectedComentariosEmpresa.get().getNombreEmpresa());
+        comentariosEmpresaModifyController.getComentario().setFechaComentario(selectedComentariosEmpresa.get().getFechaComentario());
+        splitComentariosEmpresa.getItems().add(comentariosEmpresaModifyController.getRoot());
+
+        selectedComentariosEmpresa.bind(comentariosEmpresaTable.getSelectionModel().selectedItemProperty());
+        System.out.println(selectedComentariosEmpresa.get().getIdComentario());
+        System.out.println(selectedComentariosEmpresa.get().getIdEmpresa());
+        System.out.println(selectedComentariosEmpresa.get().getIdDocente());
+
+    }
+
 
     public BorderPane getRoot() {
         return root;
@@ -211,7 +242,7 @@ public class ComentariosEmpresaController implements Initializable {
             statement.setString(1, fechaComentario);
             statement.execute();
             comentariosEmpresa.remove(selectedComentariosEmpresa.get());
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             mostrarAlertaError("Error al eliminar comentario");
             throw new RuntimeException(e);
         }
@@ -219,20 +250,20 @@ public class ComentariosEmpresaController implements Initializable {
     }
 
 
-
     @FXML
     void onSearchAllAction() {
         comentariosEmpresa.setAll(FXCollections.observableArrayList());
         try (Connection connection = HikariConnection.getConnection()) {
             Statement statement = connection.createStatement();
-            String query = "SELECT FechaComentario, empresa.IdEmpresa, tutordocente.IdDocente, tutordocente.telefonoDocente, Comentarios, empresa.NombreEmpresa, tutordocente.NombreDocente " +
+            String query = "SELECT IdComentario, FechaComentario, empresa.IdEmpresa, tutordocente.IdDocente, tutordocente.telefonoDocente, Comentarios, empresa.NombreEmpresa, tutordocente.NombreDocente " +
                     "FROM comentarioscaptacionempresa INNER JOIN empresa ON comentarioscaptacionempresa.IdEmpresa = empresa.IdEmpresa INNER JOIN tutordocente ON comentarioscaptacionempresa.IdDocente = tutordocente.IdDocente";
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 ComentariosEmpresa comentario = new ComentariosEmpresa();
-                comentario.setFechaComentario(resultSet.getString("FechaComentario"));
-                //comentario.setIdEmpresa(resultSet.getInt("IdEmpresa"));
-               // comentario.setIdDocente(resultSet.getInt("IdDocente"));
+                comentario.setFechaComentario(LocalDate.parse(resultSet.getString("FechaComentario")));
+                comentario.setIdComentario(resultSet.getInt("IdComentario"));
+                comentario.setIdEmpresa(resultSet.getInt("IdEmpresa"));
+                comentario.setIdDocente(resultSet.getInt("IdDocente"));
                 comentario.setComentarios(resultSet.getString("Comentarios"));
                 comentario.setNombreEmpresa(resultSet.getString("NombreEmpresa"));
                 comentario.setNombreDocente(resultSet.getString("NombreDocente"));
@@ -284,9 +315,9 @@ public class ComentariosEmpresaController implements Initializable {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 ComentariosEmpresa comentario = new ComentariosEmpresa();
-                comentario.setFechaComentario(resultSet.getString("FechaComentario"));
-               // comentario.setIdEmpresa(resultSet.getInt("IdEmpresa"));
-               // comentario.setIdDocente(resultSet.getInt("IdDocente"));
+                comentario.setFechaComentario(LocalDate.parse(resultSet.getString("FechaComentario")));
+                // comentario.setIdEmpresa(resultSet.getInt("IdEmpresa"));
+                // comentario.setIdDocente(resultSet.getInt("IdDocente"));
                 comentario.setComentarios(resultSet.getString("Comentarios"));
                 comentario.setNombreEmpresa(resultSet.getString("NombreEmpresa"));
                 comentario.setNombreDocente(resultSet.getString("NombreDocente"));
@@ -321,20 +352,29 @@ public class ComentariosEmpresaController implements Initializable {
         return query;
     }
 
-    public int buscarId(int IdDocente) {
-        String query = "select IdComentario from comentarioscaptacionempresa where IdDocente = ?";
+    public int buscarIdDocente(String telefono) {
+        String query = "SELECT IdDocente FROM TutorDocente WHERE TelefonoDocente = ?";
         try (Connection connection = HikariConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setInt(1, IdDocente);
+            statement.setString(1, telefono);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return resultSet.getInt("IdComentario");
 
+            if (resultSet.next()) {
+                return resultSet.getInt("IdDocente");
+            } else {
+                mostrarAlertaError("Docente no encontrado para el teléfono ");
+                throw new SQLException("Docente no encontrado para el teléfono: " + telefono);
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            mostrarAlertaError("Error al obtener IdDocente ");
+
+            throw new RuntimeException("Error al obtener IdDocente");
         }
     }
+
+
 
     private Boolean onSplitPaneChanged() {
         if (splitComentariosEmpresa.getItems().size() == 2) {
