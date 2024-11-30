@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,9 +31,13 @@ public class ComentariosEmpresaController implements Initializable {
     private ObjectProperty<ComentariosEmpresa> selectedComentariosEmpresa = new SimpleObjectProperty<>();
     private ListProperty<Empresa> empresas = new SimpleListProperty<>(FXCollections.observableArrayList());
 
+    //flag estado bloqueo tableview
+
     public ComentariosEmpresa getSelectedComentariosEmpresa() {
         return selectedComentariosEmpresa.get();
     }
+    // Controlador para ver comentarios
+    private verComentariosController verComentariosController;
 
     public ObjectProperty<ComentariosEmpresa> selectedComentariosEmpresaProperty() {
         return selectedComentariosEmpresa;
@@ -182,9 +187,21 @@ public class ComentariosEmpresaController implements Initializable {
 
         comentariosEmpresaTable.itemsProperty().bind(comentariosEmpresa);
         selectedComentariosEmpresa.bind(comentariosEmpresaTable.getSelectionModel().selectedItemProperty());
-        comentariosEmpresaTable.disableProperty().bind(Bindings.createBooleanBinding(this::onSplitPaneChanged, splitComentariosEmpresa.getItems()));
+       // comentariosEmpresaTable.disableProperty().bind(Bindings.createBooleanBinding(this::onSplitPaneChanged, splitComentariosEmpresa.getItems()));
         comentariosEmpresaModifyController.getEmpresaCombo().itemsProperty().bind(empresas);
 
+        comentariosEmpresaTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // Cuando un comentario es seleccionado, mostrar la vista de ver comentarios
+                verComentariosView(newValue);
+
+            }
+        });
+
+        // Asegurarse de que no se desactive el TableView completo
+
+
+        // Deshabilitar botones si no hay selección
         selectedComentariosEmpresa.addListener((o, ov, nv) -> {
             modifyButton.setDisable(nv == null);
             removeButton.setDisable(nv == null);
@@ -202,12 +219,36 @@ public class ComentariosEmpresaController implements Initializable {
         nombreEmpresaColumn.setCellValueFactory(v -> v.getValue().nombreEmpresaProperty());
         nombreDocenteColumn.setCellValueFactory(v -> v.getValue().nombreDocenteProperty());
         telefonoDocenteColumn.setCellValueFactory(v -> v.getValue().telefonoDocenteProperty());
+
     }
 
 
 
+    private void verComentariosView(ComentariosEmpresa comentarioSeleccionado) {
+        //comentariosEmpresaTable.disableProperty().unbind();
+        //comentariosEmpresaTable.setDisable(false);
+
+         if (verComentariosController == null) {
+            verComentariosController = new verComentariosController();
+        }
+
+        verComentariosController.bindToCommentsTable(comentariosEmpresaTable);
+
+
+        if (!splitComentariosEmpresa.getItems().contains(verComentariosController.getRoot())) {
+            splitComentariosEmpresa.getItems().add(verComentariosController.getRoot());
+        }
+    }
+
+
     @FXML
     void onModifyAction(ActionEvent event) {
+        //comentariosEmpresaTable.setDisable(true);
+
+        //desactivar verComentarios
+        if (splitComentariosEmpresa.getItems().contains(verComentariosController.getRoot())) {
+            splitComentariosEmpresa.getItems().remove(verComentariosController.getRoot());
+        }
         seleccionarEmpresas();
 
         comentariosEmpresaModifyController.setComentario(new ComentariosEmpresa());
@@ -225,6 +266,7 @@ public class ComentariosEmpresaController implements Initializable {
         System.out.println(selectedComentariosEmpresa.get().getIdComentario());
         System.out.println(selectedComentariosEmpresa.get().getIdEmpresa());
         System.out.println(selectedComentariosEmpresa.get().getIdDocente());
+
 
     }
 
@@ -298,13 +340,6 @@ public class ComentariosEmpresaController implements Initializable {
 
     }
 
-    private void mostrarAlertaError(String titulo) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titulo);
-        alert.setHeaderText(titulo);
-        alert.showAndWait();
-    }
-
     private void buscarComentarioEmpresa(String s, String s1) throws SQLException {
         comentariosEmpresa.clear();
 
@@ -321,7 +356,7 @@ public class ComentariosEmpresaController implements Initializable {
                 comentario.setComentarios(resultSet.getString("Comentarios"));
                 comentario.setNombreEmpresa(resultSet.getString("NombreEmpresa"));
                 comentario.setNombreDocente(resultSet.getString("NombreDocente"));
-
+                comentario.setTelefonoDocente(resultSet.getString("TelefonoDocente"));
                 comentariosEmpresa.add(comentario);
             }
 
@@ -343,7 +378,7 @@ public class ComentariosEmpresaController implements Initializable {
         };
 
         // Consulta principal con WHERE agregado correctamente
-        String query = "SELECT FechaComentario, Comentarios, Empresa.NombreEmpresa, TutorDocente.NombreDocente " +
+        String query = "SELECT FechaComentario, Comentarios, Empresa.NombreEmpresa, TutorDocente.NombreDocente, TutorDocente.TelefonoDocente " +
                 "FROM ComentariosCaptacionEmpresa " +
                 "INNER JOIN Empresa ON ComentariosCaptacionEmpresa.IdEmpresa = Empresa.IdEmpresa " +
                 "INNER JOIN TutorDocente ON ComentariosCaptacionEmpresa.IdDocente = TutorDocente.IdDocente" + c;
@@ -374,7 +409,12 @@ public class ComentariosEmpresaController implements Initializable {
         }
     }
 
-
+    private void mostrarAlertaError(String titulo) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(titulo);
+        alert.showAndWait();
+    }
 
     private Boolean onSplitPaneChanged() {
         if (splitComentariosEmpresa.getItems().size() == 2) {
