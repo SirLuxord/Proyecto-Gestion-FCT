@@ -24,8 +24,8 @@ import java.util.ResourceBundle;
 public class CreateAlumnoDialog extends Dialog<Alumno>  implements Initializable {
 
 
-    ObjectProperty<Alumno> alumno = new SimpleObjectProperty<>(new Alumno());
-    AlumnoController alumnoController = new AlumnoController();
+    private ObjectProperty<Alumno> alumno = new SimpleObjectProperty<>(new Alumno());
+    private AlumnoController alumnoController = new AlumnoController();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

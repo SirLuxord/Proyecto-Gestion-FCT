@@ -4,6 +4,7 @@ import dad.gestion_fct.controllers.alumno.AlumnoController;
 import dad.gestion_fct.controllers.docente.DocenteController;
 import dad.gestion_fct.controllers.empresa.EmpresaController;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaController;
+import dad.gestion_fct.controllers.visitas.VisitaController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,6 +21,7 @@ public class RootController implements Initializable {
     TutorEmpresaController tutorEmpresaController = new TutorEmpresaController();
     AlumnoController alumnoController = new AlumnoController();
     DocenteController docenteController = new DocenteController();
+    VisitaController visitaController = new VisitaController();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -27,6 +29,7 @@ public class RootController implements Initializable {
         tutorEmpTab.setContent(tutorEmpresaController.getRoot());
         alumnoTab.setContent(alumnoController.getRoot());
         docenteTab.setContent(docenteController.getRoot());
+        visitasTab.setContent(visitaController.getRoot());
     }
 
     public RootController() {

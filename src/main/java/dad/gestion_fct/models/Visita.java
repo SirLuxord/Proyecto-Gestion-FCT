@@ -113,4 +113,5 @@ public class Visita {
     public void setIdDocente(int idDocente) {
         this.idDocente.set(idDocente);
     }
+
 }
