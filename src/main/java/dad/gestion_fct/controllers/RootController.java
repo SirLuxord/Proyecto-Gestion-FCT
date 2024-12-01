@@ -1,7 +1,11 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.alumno.AlumnoController;
+import dad.gestion_fct.controllers.docente.DocenteController;
 import dad.gestion_fct.controllers.empresa.EmpresaController;
+import dad.gestion_fct.controllers.plazasEmpresa.PlazasEmpresaController;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaController;
+import dad.gestion_fct.controllers.visitas.VisitaController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -67,6 +71,9 @@ public class RootController implements Initializable {
 
     @FXML
     private Tab visitasTab;
+
+    @FXML
+    private Tab plazasTab;
 
     public TabPane getRoot() {
         return root;
