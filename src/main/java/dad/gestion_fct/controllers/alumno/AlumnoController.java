@@ -1,7 +1,12 @@
 package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.HikariConnection;
-import dad.gestion_fct.models.*;
+//import dad.gestion_fct.models.*;
+
+import dad.gestion_fct.models.Alumno;
+import dad.gestion_fct.models.Ciclos;
+import dad.gestion_fct.models.Docente;
+import dad.gestion_fct.models.TutorEmpresa;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;

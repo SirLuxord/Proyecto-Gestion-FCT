@@ -15,7 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -38,13 +37,6 @@ public class ContactoEmpController implements Initializable {
         return selectedContactoEmp.get();
     }
 
-    public ObjectProperty<ContactoEmp> selectedContactoEmpProperty() {
-        return selectedContactoEmp;
-    }
-
-    public void setSelectedContactoEmp(ContactoEmp selectedContactoEmp) {
-        this.selectedContactoEmp.set(selectedContactoEmp);
-    }
 
     @FXML
     private SplitPane splitContactoEmpresa;
@@ -122,7 +114,8 @@ public class ContactoEmpController implements Initializable {
             searchButton.setDisable(nv);
             searchAllButton.setDisable(nv);
         });
-        //empresaColumn.setCellValueFactory(v -> v.getValue().();
+
+        //cell values
         nombreColumn.setCellValueFactory(v -> v.getValue().nombreContactoProperty());
         apellidoColumn.setCellValueFactory(v -> v.getValue().apellidoContactoProperty());
         correoColumn.setCellValueFactory(v -> v.getValue().correoContactoProperty());
@@ -148,7 +141,7 @@ public class ContactoEmpController implements Initializable {
         return splitContactoEmpresa;
     }
 
-    //metodos acciones iinterfaz
+    //metodos acciones interfaz
 
     @FXML
     void onAddAction(ActionEvent event) throws SQLException {
@@ -159,7 +152,7 @@ public class ContactoEmpController implements Initializable {
 
         if (result.isPresent()) {
             ContactoEmp contacto = result.get();
-
+                //comprobaciones
             if (contacto.getNombreContacto().trim().isEmpty()) {
                 mostrarAlertaError("Campo de nombre vacío");
                 throw new IllegalArgumentException("Campo de nombre vacío");

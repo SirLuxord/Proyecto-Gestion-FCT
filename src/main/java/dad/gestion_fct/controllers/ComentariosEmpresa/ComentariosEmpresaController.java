@@ -3,7 +3,6 @@ package dad.gestion_fct.controllers.ComentariosEmpresa;
 import dad.gestion_fct.HikariConnection;
 import dad.gestion_fct.models.ComentariosEmpresa;
 import dad.gestion_fct.models.Empresa;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -15,8 +14,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -31,21 +28,13 @@ public class ComentariosEmpresaController implements Initializable {
     private ObjectProperty<ComentariosEmpresa> selectedComentariosEmpresa = new SimpleObjectProperty<>();
     private ListProperty<Empresa> empresas = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    //flag estado bloqueo tableview
-
     public ComentariosEmpresa getSelectedComentariosEmpresa() {
         return selectedComentariosEmpresa.get();
     }
+
     // Controlador para ver comentarios
     private verComentariosController verComentariosController;
 
-    public ObjectProperty<ComentariosEmpresa> selectedComentariosEmpresaProperty() {
-        return selectedComentariosEmpresa;
-    }
-
-    public void setSelectedComentariosEmpresa(ComentariosEmpresa selectedComentariosEmpresa) {
-        this.selectedComentariosEmpresa.set(selectedComentariosEmpresa);
-    }
 
     @FXML
     private TableColumn<ComentariosEmpresa, String> comentariosColumn;
@@ -111,14 +100,12 @@ public class ComentariosEmpresaController implements Initializable {
         if (result.isPresent()) {
             ComentariosEmpresa comentario = result.get();
             comentario.setIdDocente(buscarIdDocente(comentario.getTelefonoDocente()));
-
-            // Check for empty or null values before trimming
+            //comprobaciones
             if (comentario.getNombreDocente().trim().isEmpty()) {
                 mostrarAlertaError("Nombre sin introducir");
                 throw new IllegalArgumentException("Nombre sin introducir");
             }
 
-            // Check for null or empty telefonoDocente
             if (comentario.getTelefonoDocente() == null || comentario.getTelefonoDocente().trim().isEmpty()) {
                 mostrarAlertaError("Telefono sin introducir");
                 throw new IllegalArgumentException("Telefono sin introducir");
@@ -187,7 +174,6 @@ public class ComentariosEmpresaController implements Initializable {
 
         comentariosEmpresaTable.itemsProperty().bind(comentariosEmpresa);
         selectedComentariosEmpresa.bind(comentariosEmpresaTable.getSelectionModel().selectedItemProperty());
-       // comentariosEmpresaTable.disableProperty().bind(Bindings.createBooleanBinding(this::onSplitPaneChanged, splitComentariosEmpresa.getItems()));
         comentariosEmpresaModifyController.getEmpresaCombo().itemsProperty().bind(empresas);
 
         comentariosEmpresaTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -197,8 +183,6 @@ public class ComentariosEmpresaController implements Initializable {
 
             }
         });
-
-        // Asegurarse de que no se desactive el TableView completo
 
 
         // Deshabilitar botones si no hay selección
@@ -223,12 +207,9 @@ public class ComentariosEmpresaController implements Initializable {
     }
 
 
-
     private void verComentariosView(ComentariosEmpresa comentarioSeleccionado) {
-        //comentariosEmpresaTable.disableProperty().unbind();
-        //comentariosEmpresaTable.setDisable(false);
 
-         if (verComentariosController == null) {
+        if (verComentariosController == null) {
             verComentariosController = new verComentariosController();
         }
 

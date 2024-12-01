@@ -12,7 +12,6 @@
       <Tab fx:id="comentariosTab" text="Comentarios" />
       <Tab fx:id="contactoTab" text="Contacto"/>
       <Tab fx:id="visitasTab" text="Visitas" />
-      <Tab fx:id="asignacionesTab" text="Asignaciones" />
       <Tab fx:id="plazasTab" text="Plazas" />
   </tabs>
 </TabPane>
