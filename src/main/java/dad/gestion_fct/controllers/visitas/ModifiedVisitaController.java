@@ -125,8 +125,8 @@ public class ModifiedVisitaController implements Initializable {
         int newIdAlumno = visitaModified.get().getIdAlumno();
         String newNombre = visitaModified.get().getNombreAlumno();
         String newApellido = visitaModified.get().getApellidoAlumno();
-        String newDocenteNombre = visitaModified.get().getNombreAlumno();
-        String newDocenteApellido = visitaModified.get().getApellidoAlumno();
+        String newDocenteNombre = visitaModified.get().getNombreDocente();
+        String newDocenteApellido = visitaModified.get().getApellidoDocente();
         LocalDate fechaVisita  = fechaDatePicker.getValue();
         String observacion = observacionTextArea.getText();
 
