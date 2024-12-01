@@ -98,4 +98,9 @@ public class TutorEmpresa {
     public void setTelefono(String telefono) {
         this.telefono.set(telefono);
     }
+
+    @Override
+    public String toString() {
+        return getNombre();
+    }
 }

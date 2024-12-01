@@ -1,8 +1,11 @@
 package dad.gestion_fct.controllers;
 
+import dad.gestion_fct.controllers.alumno.AlumnoController;
+import dad.gestion_fct.controllers.docente.DocenteController;
 import dad.gestion_fct.controllers.empresa.EmpresaController;
 import dad.gestion_fct.controllers.plazasEmpresa.PlazasEmpresaController;
 import dad.gestion_fct.controllers.tutorEmpresa.TutorEmpresaController;
+import dad.gestion_fct.controllers.visitas.VisitaController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,12 +21,18 @@ public class RootController implements Initializable {
     EmpresaController empresaController = new EmpresaController();
     TutorEmpresaController tutorEmpresaController = new TutorEmpresaController();
     PlazasEmpresaController plazasEmpresaController = new PlazasEmpresaController();
+    AlumnoController alumnoController = new AlumnoController();
+    DocenteController docenteController = new DocenteController();
+    VisitaController visitaController = new VisitaController();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         empresasTab.setContent(empresaController.getRoot());
         tutorEmpTab.setContent(tutorEmpresaController.getRoot());
         plazasTab.setContent(plazasEmpresaController.getRoot());
+        alumnoTab.setContent(alumnoController.getRoot());
+        docenteTab.setContent(docenteController.getRoot());
+        visitasTab.setContent(visitaController.getRoot());
     }
 
     public RootController() {
@@ -35,9 +44,6 @@ public class RootController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
-    @FXML
-    private Tab plazasTab;
 
     @FXML
     private Tab alumnoTab;
@@ -65,6 +71,9 @@ public class RootController implements Initializable {
 
     @FXML
     private Tab visitasTab;
+
+    @FXML
+    private Tab plazasTab;
 
     public TabPane getRoot() {
         return root;

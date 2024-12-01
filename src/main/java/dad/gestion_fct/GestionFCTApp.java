@@ -16,5 +16,6 @@ public class GestionFCTApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Gestión FCT");
         primaryStage.show();
+
     }
 }
