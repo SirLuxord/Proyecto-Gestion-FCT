@@ -1,4 +1,4 @@
-package dad.gestion_fct.controllers.tutorEmpresa;
+package dad.gestion_fct.controllers.plazasEmpresa;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class TutorEmpresaSearchDialog extends Dialog<String> implements Initializable {
+public class PlazasEmpresaSearchDialog extends Dialog<String> implements Initializable {
 
     // model
 
@@ -26,7 +26,8 @@ public class TutorEmpresaSearchDialog extends Dialog<String> implements Initiali
     @FXML
     private BorderPane root;
 
-    public TutorEmpresaSearchDialog(){
+
+    public PlazasEmpresaSearchDialog(){
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SearchView.fxml"));
             loader.setController(this);
@@ -39,7 +40,7 @@ public class TutorEmpresaSearchDialog extends Dialog<String> implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        fieldComboBox.getItems().setAll("Nombre empresa" , "Nombre" , "Apellido" , "Correo" , "Teléfono");
+        fieldComboBox.getItems().setAll("Nombre ciclo" , "Nombre empresa");
 
         // init dialog
 
