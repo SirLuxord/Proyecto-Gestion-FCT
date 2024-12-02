@@ -125,6 +125,7 @@ public class PlazasEmpresaController implements Initializable {
         cicloColumn.setCellValueFactory(v -> v.getValue().nombreCicloProperty());
         numeroPlazasColumn.setCellValueFactory(v -> v.getValue().numeroPlazasProperty());
 
+        buscarPlazas(getSearchQuery(""),"");
 
     }
 

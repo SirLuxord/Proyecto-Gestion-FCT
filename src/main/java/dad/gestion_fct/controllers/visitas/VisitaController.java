@@ -67,6 +67,12 @@ public class VisitaController implements Initializable {
         // Buttons listener
 
         selectedVisita.addListener((o , ov ,nv) -> {
+            if (nv != null) {
+                modifiedVisitaController.getVisitaModified().setIdAlumno(nv.getIdAlumno());
+                modifiedVisitaController.getVisitaModified().setFechaVisita(nv.getFechaVisita());
+                modifiedVisitaController.getVisitaModified().setObservacion(nv.getObservacion());
+                observacionController.setVisitaObservacion(nv);
+            }
 
 
             if (!modificar) {
@@ -76,10 +82,7 @@ public class VisitaController implements Initializable {
                     if (!splitVisita.getItems().contains(observacionController.getRoot())) {
                         splitVisita.getItems().add(observacionController.getRoot());
                     }
-                    modifiedVisitaController.getVisitaModified().setIdAlumno(nv.getIdAlumno());
-                    modifiedVisitaController.getVisitaModified().setFechaVisita(nv.getFechaVisita());
-                    modifiedVisitaController.getVisitaModified().setObservacion(nv.getObservacion());
-                    observacionController.setVisitaObservacion(nv);
+
                 } else {
                     splitVisita.getItems().remove(observacionController.getRoot());
                     observacionController.setVisitaObservacion(new Visita());

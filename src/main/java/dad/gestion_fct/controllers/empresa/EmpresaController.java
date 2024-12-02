@@ -124,7 +124,7 @@ public class EmpresaController implements Initializable {
         // cell factories
 
         publicaColumn.setCellFactory(CheckBoxTableCell.forTableColumn(publicaColumn));
-
+        buscarEmpresas(getSearchQuery(""), "");
     }
 
     private Boolean onSplitPaneChanged() {

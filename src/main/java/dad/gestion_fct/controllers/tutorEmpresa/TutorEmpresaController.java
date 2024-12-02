@@ -124,6 +124,7 @@ public class TutorEmpresaController implements Initializable {
         correoColumn.setCellValueFactory(v -> v.getValue().correoProperty());
         telefonoColumn.setCellValueFactory(v -> v.getValue().telefonoProperty());
 
+        buscarTutores(getSearchQuery(""),"");
     }
 
     private Boolean onSplitPaneChanged() {

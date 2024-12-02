@@ -204,6 +204,11 @@ public class ComentariosEmpresaController implements Initializable {
         nombreDocenteColumn.setCellValueFactory(v -> v.getValue().nombreDocenteProperty());
         telefonoDocenteColumn.setCellValueFactory(v -> v.getValue().telefonoDocenteProperty());
 
+        try {
+            buscarComentarioEmpresa("","");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
