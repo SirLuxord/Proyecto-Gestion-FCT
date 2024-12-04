@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <SplitPane fx:id="splitAlumno" BorderPane.alignment="CENTER">
          <items>
@@ -23,6 +23,7 @@
                         <TableColumn fx:id="cicloAlumColumn" prefWidth="75.0" text="Ciclo" />
                         <TableColumn fx:id="nussAlumColumn" prefWidth="75.0" text="Nuss" />
                       <TableColumn fx:id="docenteAlumColumn" prefWidth="75.0" text="Docente" />
+                        <TableColumn fx:id="empresaColumn" prefWidth="75.0" text="Empresa" />
                         <TableColumn fx:id="tutorAlumColumn" prefWidth="75.0" text="Tutor Empresa" />
                     </columns>
                      <columnResizePolicy>

@@ -51,6 +51,7 @@ public class AlumnoController implements Initializable {
         cicloAlumColumn.setCellValueFactory(v -> v.getValue().cicloAlumnoProperty());
         nussAlumColumn.setCellValueFactory(v -> v.getValue().nussAlumnoProperty());
         docenteAlumColumn.setCellValueFactory(v -> v.getValue().nombreDocenteProperty());
+        empresaColumn.setCellValueFactory(v -> v.getValue().empresaProperty());
         tutorAlumColumn.setCellValueFactory(v -> v.getValue().tutorEmpresaProperty());
 
         // Table binding
@@ -68,6 +69,8 @@ public class AlumnoController implements Initializable {
                 modifiedAlumnoController.getAlumnoModify().setNombreAlumno(newValue.getNombreAlumno());
                 modifiedAlumnoController.getAlumnoModify().setApellidoAlumno(newValue.getApellidoAlumno());
                 modifiedAlumnoController.getAlumnoModify().setNussAlumno(newValue.getNussAlumno());
+                modifiedAlumnoController.getAlumnoModify().setEmpresa(newValue.getEmpresa());
+                modifiedAlumnoController.getAlumnoModify().setIdempresa(newValue.getIdempresa());
 
                 // Actualizar ciclo
                 modifiedAlumnoController.getCicloComboBox()
@@ -87,6 +90,16 @@ public class AlumnoController implements Initializable {
                         .findFirst()
                         .ifPresent(docente ->
                                 modifiedAlumnoController.getDocenteComboBox().getSelectionModel().select(docente)
+                        );
+
+                // Actualizar empresa
+                modifiedAlumnoController.getEmpresaComboBox()
+                        .getItems()
+                        .stream()
+                        .filter(empresa -> empresa.getNombre().equals(newValue.getEmpresa()))
+                        .findFirst()
+                        .ifPresent(empresa ->
+                                modifiedAlumnoController.getEmpresaComboBox().getSelectionModel().select(empresa)
                         );
 
                 // Actualizar tutor
@@ -153,7 +166,12 @@ public class AlumnoController implements Initializable {
     private TableColumn<Alumno, String> docenteAlumColumn;
 
     @FXML
+    private TableColumn<Alumno, String> empresaColumn;
+
+    @FXML
     private TableColumn<Alumno, String> tutorAlumColumn;
+
+
 
     @FXML
     private SplitPane splitAlumno;
@@ -341,6 +359,8 @@ public class AlumnoController implements Initializable {
                 alumno.setIdDocente(resultSet.getInt("tutordocente.IdDocente"));
                 alumno.setTutorEmpresa(resultSet.getString("tutorempresa.NombreTE"));
                 alumno.setIdTutor(resultSet.getInt("tutorempresa.IdTE"));
+                alumno.setEmpresa(resultSet.getString("empresa.NombreEmpresa"));
+                alumno.setIdempresa(resultSet.getInt("empresa.IdEmpresa"));
 
 
                 listaAlumno.add(alumno);
@@ -365,9 +385,9 @@ public class AlumnoController implements Initializable {
 
 
         String query = "SELECT IdAlumno, CIALAlumno, NombreAlumno, ApellidoAlumno, CicloAlumno, NussAlumno, tutordocente.NombreDocente, tutordocente.IdDocente," +
-                "tutorempresa.NombreTE, tutorempresa.IdTE FROM alumno INNER JOIN tutordocente on " +
+                "tutorempresa.NombreTE, tutorempresa.IdTE, empresa.NombreEmpresa, empresa.IdEmpresa FROM alumno INNER JOIN tutordocente on " +
                 "alumno.IdDocente = tutordocente.IdDocente INNER JOIN tutorempresa on " +
-                "alumno.IDTutorE = tutorempresa.IdTE " + condicion ;
+                "alumno.IDTutorE = tutorempresa.IdTE INNER JOIN empresa on tutorempresa.IdEmpresa = empresa.IdEmpresa  " + condicion;
         return query;
     }
 

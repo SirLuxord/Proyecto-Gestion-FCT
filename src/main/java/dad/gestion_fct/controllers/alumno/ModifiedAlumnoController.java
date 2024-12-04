@@ -1,10 +1,7 @@
 package dad.gestion_fct.controllers.alumno;
 
 import dad.gestion_fct.HikariConnection;
-import dad.gestion_fct.models.Alumno;
-import dad.gestion_fct.models.Ciclos;
-import dad.gestion_fct.models.Docente;
-import dad.gestion_fct.models.TutorEmpresa;
+import dad.gestion_fct.models.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -59,7 +56,13 @@ public class ModifiedAlumnoController implements Initializable {
                 alumnoModify.get().setTutorEmpresa(nv.getNombre());
             }
         });
-
+        empresaComboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
+            if (nv != null){
+                alumnoModify.get().setIdempresa(nv.getIdEmpresa());
+                alumnoModify.get().setEmpresa(nv.getNombre());
+                añadirTutores();
+            }
+        });
     }
 
     public ModifiedAlumnoController(AlumnoController alumnoController) {
@@ -90,6 +93,9 @@ public class ModifiedAlumnoController implements Initializable {
 
     @FXML
     private ComboBox<Docente> docenteComboBox;
+
+    @FXML
+    private ComboBox<Empresa> empresaComboBox;
 
     @FXML
     private ComboBox<TutorEmpresa> tutorComboBox;
@@ -159,8 +165,8 @@ public class ModifiedAlumnoController implements Initializable {
         return alumnoModify.get();
     }
 
-    public ObjectProperty<Alumno> alumnoModifyProperty() {
-        return alumnoModify;
+    public void setEmpresaComboBox(ComboBox<Empresa> empresaComboBox) {
+        this.empresaComboBox = empresaComboBox;
     }
 
     public BorderPane getRoot() {
@@ -186,11 +192,31 @@ public class ModifiedAlumnoController implements Initializable {
         }
     }
 
+    public void añadirEmpresa(){
+        try (Connection connection = HikariConnection.getConnection()) {
+
+            String query = "SELECT IdEmpresa, NombreEmpresa FROM `empresa`";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Empresa empresa = new Empresa();
+                    empresa.setIdEmpresa(resultSet.getInt("IdEmpresa"));
+                    empresa.setNombre(resultSet.getString("NombreEmpresa"));
+                    empresaComboBox.getItems().add(empresa);
+                }
+            }
+        } catch (SQLException e) {
+            alumnoController.mostrarError(e.getLocalizedMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
     public void añadirTutores(){
         try (Connection connection = HikariConnection.getConnection()) {
 
-            String query = "SELECT IdTE, NombreTE FROM `tutorempresa`";
+            String query = "SELECT IdTE, NombreTE FROM `tutorempresa`  where IdEmpresa = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, alumnoModify.get().getIdempresa());
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     TutorEmpresa tutor = new TutorEmpresa();
@@ -207,13 +233,14 @@ public class ModifiedAlumnoController implements Initializable {
 
     public void addRemoveCombBox(){
         docenteComboBox.getItems().clear();
+        empresaComboBox.getItems().clear();
         tutorComboBox.getItems().clear();
-        TutorEmpresa tutorVacio = new TutorEmpresa();
-        tutorVacio.setNombre("");
-        tutorVacio.setId(-1);
-        tutorComboBox.getItems().add(tutorVacio);
+        Empresa empresa = new Empresa();
+        empresa.setNombre("");
+        empresa.setIdEmpresa(-1);
+        empresaComboBox.getItems().add(empresa);
         añadirDocente();
-        añadirTutores();
+        añadirEmpresa();
     }
 
     private void actualizarRegistroCompleto(String newCial, String newNombre, String newApellido, String newCiclo, String newNuss, String newNombreDocente, int newIdDocente, String newNombreTutor, int newIdTutor) {
@@ -240,7 +267,17 @@ public class ModifiedAlumnoController implements Initializable {
         return docenteComboBox;
     }
 
+    public ComboBox<Empresa> getEmpresaComboBox() {
+        return empresaComboBox;
+    }
+
     public ComboBox<TutorEmpresa> getTutorComboBox() {
         return tutorComboBox;
     }
+
+    public ObjectProperty<Alumno> alumnoModifyProperty() {
+        return alumnoModify;
+    }
+
+
 }
