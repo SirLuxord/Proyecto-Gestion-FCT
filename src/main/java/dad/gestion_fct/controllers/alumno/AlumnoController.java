@@ -3,10 +3,7 @@ package dad.gestion_fct.controllers.alumno;
 import dad.gestion_fct.HikariConnection;
 //import dad.gestion_fct.models.*;
 
-import dad.gestion_fct.models.Alumno;
-import dad.gestion_fct.models.Ciclos;
-import dad.gestion_fct.models.Docente;
-import dad.gestion_fct.models.TutorEmpresa;
+import dad.gestion_fct.models.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -288,6 +285,14 @@ public class AlumnoController implements Initializable {
         matchingDocente.ifPresent(docente ->
                 modifiedAlumnoController.getDocenteComboBox().getSelectionModel().select(docente)
         );
+        Optional<Empresa> matchingEmpresa = modifiedAlumnoController.getEmpresaComboBox()
+                .getItems()
+                .stream()
+                .filter(empresa -> empresa.getNombre().equals(selectedAlumno.get().getEmpresa()))
+                .findFirst();
+        matchingEmpresa.ifPresent(empresa ->
+                modifiedAlumnoController.getEmpresaComboBox().getSelectionModel().select(empresa)
+        );
         Optional<TutorEmpresa> matchingTutor = modifiedAlumnoController.getTutorComboBox()
                 .getItems()
                 .stream()
@@ -296,6 +301,7 @@ public class AlumnoController implements Initializable {
         matchingTutor.ifPresent(tutor ->
                 modifiedAlumnoController.getTutorComboBox().getSelectionModel().select(tutor)
         );
+
         splitAlumno.getItems().add(modifiedAlumnoController.getRoot());
     }
 
