@@ -60,6 +60,7 @@ public class ModifiedAlumnoController implements Initializable {
             if (nv != null){
                 alumnoModify.get().setIdempresa(nv.getIdEmpresa());
                 alumnoModify.get().setEmpresa(nv.getNombre());
+                tutorComboBox.getItems().clear();
                 añadirTutores();
             }
         });
